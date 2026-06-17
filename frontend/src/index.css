@@ -249,17 +249,19 @@ button { font-family: var(--font-heading); }
   }
 }
 
-/* Print-safe (white) toggle — forces black on white with no shadows */
-body.print-safe,
-body.print-safe * {
-  background: #ffffff !important;
-  background-image: none !important;
-  color: #000000 !important;
-  box-shadow: none !important;
-  text-shadow: none !important;
-  filter: none !important;
-  border-color: #000000 !important;
+/* Print-safe (white) toggle — only affects the printed PDF, not the on-screen view */
+@media print {
+  body.print-safe,
+  body.print-safe * {
+    background: #ffffff !important;
+    background-image: none !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+    border-color: #000000 !important;
+  }
+  body.print-safe .spore-canvas,
+  body.print-safe .no-print { display: none !important; }
+  body.print-safe::before { display: none !important; }
 }
-body.print-safe .spore-canvas,
-body.print-safe .no-print { display: none !important; }
-body.print-safe::before { display: none !important; }

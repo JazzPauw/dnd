@@ -162,6 +162,11 @@ def start_frontend() -> None:
 
 def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+    try:
+        from updater import check_for_updates
+        check_for_updates()
+    except Exception as e:
+        print(f"[updater] skipped: {e}")
     print("[mycelium] starting backend (local JSON storage)…")
     proc = start_backend()
     try:

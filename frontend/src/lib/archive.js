@@ -26,31 +26,36 @@ export async function importCharacterArchive(file) {
   const text = await file.text();
   const data = JSON.parse(text);
   if (data._format !== "mycelial-archive/v1") throw new Error("Unrecognized archive format");
-  // create a new character (fresh id)
-  const { id: _oldId, created_at, updated_at, ...charBody } = data.character;
-  charBody.name = (charBody.name || "Imported") + " (imported)";
-  const newChar = await api.post("/characters", charBody).then((r) => r.data);
-  const oldId = _oldId;
+  const incoming = data.character;
+  const oldId = incoming.id;
+  const { id: _i, _id: _x, created_at, updated_at, ...charBody } = incoming;
 
-  // re-create every doc under new character_id; remap memory connection ids too
-  const idMap = {};
+  // Does a character with that id already exist? If so → overwrite. Else → restore with same id.
+  let target;
+  try {
+    target = await api.get(`/characters/${oldId}`).then((r) => r.data);
+  } catch { target = null; }
+
+  if (target) {
+    // overwrite character
+    await api.put(`/characters/${oldId}`, { ...target, ...charBody });
+    // wipe all owned collections
+    const wipe = ["spells","creatures","diary","memories","dreams","fungi","recipes","deaths","resources","effects","inventory","themes","macros","presets","ledger"];
+    for (const c of wipe) {
+      const docs = await api.get(`/${c}`, { params: { character_id: oldId } }).then((r) => r.data);
+      for (const d of docs) await api.delete(`/${c}/${d.id}`);
+    }
+    target = await api.get(`/characters/${oldId}`).then((r) => r.data);
+  } else {
+    target = await api.post("/characters", { ...charBody, id: oldId }).then((r) => r.data);
+  }
+
+  // re-create every doc under the target character_id, preserving original ids so connections stay valid
   for (const [coll, docs] of Object.entries(data.collections || {})) {
     for (const d of docs) {
-      const { id: oldEntryId, _id: _x, character_id: _c, created_at: _a, updated_at: _u, ...rest } = d;
-      const payload = { ...rest, character_id: newChar.id };
-      const created = await api.post(`/${coll}`, payload).then((r) => r.data);
-      idMap[oldEntryId] = created.id;
+      const { _id: _x, character_id: _c, ...rest } = d;
+      await api.post(`/${coll}`, { ...rest, character_id: target.id });
     }
   }
-  // patch memory.connections to remapped ids
-  const mems = await api.get(`/memories`, { params: { character_id: newChar.id } }).then((r) => r.data);
-  for (const m of mems) {
-    if (Array.isArray(m.connections) && m.connections.length) {
-      const fixed = m.connections.map((c) => idMap[c]).filter(Boolean);
-      if (JSON.stringify(fixed) !== JSON.stringify(m.connections)) {
-        await api.put(`/memories/${m.id}`, { ...m, connections: fixed });
-      }
-    }
-  }
-  return newChar;
+  return target;
 }

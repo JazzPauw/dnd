@@ -1,43 +1,34 @@
 # The Mycelial Archive
 
-An immersive D&D companion and personal lore wiki for a Wood Elf Swarm Ranger / Circle of Spores Druid — designed to feel like a living mycelial network.
+An immersive D&D companion and personal lore wiki — designed to feel like a living mycelial network. Local-first, no database required.
 
-## Run locally (no database required)
+## Install
 
-Prereqs: **Python 3.10+**, **Node 18+**, **Yarn** (`npm i -g yarn`). No MongoDB needed.
-
-```bash
-# 1. One-time install
-./install.sh              # Linux / macOS
-install.bat               # Windows
-
-# 2. Launch (opens browser at http://localhost:5145)
-python3 launcher.py
-```
-
-All data is saved locally as JSON in:
-
-- Linux/macOS: `~/.mycelial-archive/`
-- Windows: `%USERPROFILE%\.mycelial-archive\`
-
-Override with `MYCELIUM_DATA_DIR=/some/path python3 launcher.py`.
-
-Customize ports:
+Prereqs: **Python 3.10+**, **Node 18+**, **Yarn** (`npm i -g yarn`).
 
 ```bash
-MYCELIUM_FRONT_PORT=5145 MYCELIUM_BACK_PORT=8001 python3 launcher.py
+# Linux / macOS
+./install.sh
+python3 create_shortcut.py     # adds desktop launcher
+python3 launcher.py            # opens http://localhost:5145
+
+# Windows
+install.bat
+python create_shortcut.py
+python launcher.py
 ```
+
+Data is saved as JSON in `~/.mycelial-archive/` (override with `MYCELIUM_DATA_DIR`).
+
+## Updates
+
+The launcher auto-checks for updates on every start:
+- If the install dir is a **git** repo → `git pull --ff-only`.
+- Else if `MYCELIUM_UPDATE_URL` is set to a JSON manifest URL (`{ "version": "x.y.z", "zip_url": "..." }`) → downloads & extracts the newer zip.
+- Set `MYCELIUM_SKIP_UPDATE=1` to disable.
+
+After an update that changes the frontend, run `cd frontend && yarn build` once.
 
 ## Features
 
-- **Living Body** — HP, AC, custom resources, Long/Short Rest with animations
-- **Character Sheet** — attributes, skills (click-to-roll), currency
-- **Spell Archive** — slots, filters, `always_prepared`, save/apply preset loadouts
-- **Inventory** — table with weight totals, attunement, equipped
-- **Roll Macros** — Roll20-style formulas, one-click copy
-- **Creature Journal**, **Diary**, **Memories** (constellation with explicit connections), **Dreams**
-- **Fungarium**, **Apothecary** (Known/Experimental/Forbidden)
-- **Cycle of Death** — a garden, not a graveyard
-- **The Network** — interactive force-directed graph
-- **Activity Ledger**, Global Search (Cmd+K), PDF export (per page)
-- **Multi-character** with per-character themes and renameable section labels (Settings)
+Living Body dashboard · Character Sheet · Spell Archive (slots, filters, always_prepared, preset loadouts, **multi-select PDF export**) · Inventory · Roll Macros · Creature Journal · Diary · Memories (constellation + connections) · Dreams · Fungarium · Apothecary · Cycle of Death · The Network (force-directed graph) · Activity Ledger · Global Search (Cmd+K) · Per-character themes & renamable sections · **Import / Export character archive** (overwrites existing) · **Image upload** (local file → embedded data URL).

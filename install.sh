@@ -18,5 +18,6 @@ cd ..
 
 echo
 echo "[mycelium] installed."
-echo "         Run:  python3 launcher.py"
-echo "         Data: ~/.mycelial-archive/"
+echo "         Run:        python3 launcher.py"
+echo "         Shortcut:   python3 create_shortcut.py"
+echo "         Data:       ~/.mycelial-archive/"

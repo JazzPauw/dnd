@@ -19,8 +19,9 @@ cd ..
 
 echo.
 echo [mycelium] installed.
-echo          Run:  python launcher.py
-echo          Data: %%USERPROFILE%%\.mycelial-archive\
+echo          Run:       python launcher.py
+echo          Shortcut:  python create_shortcut.py
+echo          Data:      %%USERPROFILE%%\.mycelial-archive\
 goto :eof
 
 :fail

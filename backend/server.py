@@ -19,9 +19,15 @@ from datetime import datetime, timezone
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
 
-mongo_url = os.environ["MONGO_URL"]
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ["DB_NAME"]]
+# Storage: local JSON files (no MongoDB) when MYCELIUM_LOCAL=1, else MongoDB.
+if os.environ.get("MYCELIUM_LOCAL") == "1":
+    from local_db import LocalClient
+    client = LocalClient()
+    db = client[os.environ.get("DB_NAME", "mycelial_archive")]
+else:
+    mongo_url = os.environ["MONGO_URL"]
+    client = AsyncIOMotorClient(mongo_url)
+    db = client[os.environ["DB_NAME"]]
 
 app = FastAPI(title="The Mycelial Archive")
 api = APIRouter(prefix="/api")

@@ -1,31 +1,35 @@
 import React from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import {
   Heart, BookOpen, Skull, Leaf, Moon, Sparkles, FlaskConical,
   Flower2, Network, Search, ScrollText, Users, Palette, ListTree,
+  Backpack, Dice5, Settings as SettingsIcon,
 } from "lucide-react";
 import { useCharacter } from "@/contexts/CharacterContext";
 
 const NAV = [
-  { to: "/", label: "Living Body", icon: Heart, testid: "nav-dashboard" },
-  { to: "/sheet", label: "Character Sheet", icon: ScrollText, testid: "nav-sheet" },
-  { to: "/spells", label: "Spell Archive", icon: Sparkles, testid: "nav-spells" },
-  { to: "/creatures", label: "Creature Journal", icon: Skull, testid: "nav-creatures" },
-  { to: "/diary", label: "Diary", icon: BookOpen, testid: "nav-diary" },
-  { to: "/memories", label: "Memories", icon: Network, testid: "nav-memories" },
-  { to: "/dreams", label: "Dreams", icon: Moon, testid: "nav-dreams" },
-  { to: "/fungarium", label: "Fungarium", icon: Leaf, testid: "nav-fungarium" },
-  { to: "/apothecary", label: "Apothecary", icon: FlaskConical, testid: "nav-apothecary" },
-  { to: "/cycle", label: "Cycle of Death", icon: Flower2, testid: "nav-cycle" },
-  { to: "/network", label: "The Network", icon: Network, testid: "nav-network" },
-  { to: "/ledger", label: "Activity Ledger", icon: ListTree, testid: "nav-ledger" },
-  { to: "/themes", label: "Themes", icon: Palette, testid: "nav-themes" },
-  { to: "/characters", label: "Characters", icon: Users, testid: "nav-characters" },
+  { to: "/", key: "dashboard", label: "Living Body", icon: Heart },
+  { to: "/sheet", key: "sheet", label: "Character Sheet", icon: ScrollText },
+  { to: "/spells", key: "spells", label: "Spell Archive", icon: Sparkles },
+  { to: "/inventory", key: "inventory", label: "Inventory", icon: Backpack },
+  { to: "/macros", key: "macros", label: "Roll Macros", icon: Dice5 },
+  { to: "/creatures", key: "creatures", label: "Creature Journal", icon: Skull },
+  { to: "/diary", key: "diary", label: "Diary", icon: BookOpen },
+  { to: "/memories", key: "memories", label: "Memories", icon: Network },
+  { to: "/dreams", key: "dreams", label: "Dreams", icon: Moon },
+  { to: "/fungarium", key: "fungarium", label: "Fungarium", icon: Leaf },
+  { to: "/apothecary", key: "apothecary", label: "Apothecary", icon: FlaskConical },
+  { to: "/cycle", key: "cycle", label: "Cycle of Death", icon: Flower2 },
+  { to: "/network", key: "network", label: "The Network", icon: Network },
+  { to: "/ledger", key: "ledger", label: "Activity Ledger", icon: ListTree },
+  { to: "/themes", key: "themes", label: "Themes", icon: Palette },
+  { to: "/characters", key: "characters", label: "Characters", icon: Users },
+  { to: "/settings", key: "settings", label: "Settings", icon: SettingsIcon },
 ];
 
 export default function Sidebar({ onOpenSearch }) {
   const { current, characters, selectCharacter } = useCharacter();
-  const nav = useNavigate();
+  const labels = current?.section_labels || {};
 
   return (
     <aside className="no-print sticky top-0 h-screen w-64 shrink-0 border-r border-white/5 px-6 py-8 flex flex-col" data-testid="sidebar">
@@ -36,9 +40,8 @@ export default function Sidebar({ onOpenSearch }) {
         <p className="label-arcane mt-2">a living wiki</p>
       </div>
 
-      {/* Character switcher */}
       <div className="mb-6">
-        <label className="label-arcane block mb-2">Vessel</label>
+        <label className="label-arcane block mb-2">Character</label>
         <select
           value={current?.id || ""}
           onChange={(e) => selectCharacter(e.target.value)}
@@ -51,11 +54,7 @@ export default function Sidebar({ onOpenSearch }) {
         </select>
       </div>
 
-      <button
-        onClick={onOpenSearch}
-        className="btn-organic mb-4 justify-between"
-        data-testid="open-command-palette"
-      >
+      <button onClick={onOpenSearch} className="btn-organic mb-4 justify-between" data-testid="open-command-palette">
         <span className="flex items-center gap-2"><Search size={14} /> Search</span>
         <kbd className="font-mono text-[10px] opacity-70">⌘K</kbd>
       </button>
@@ -69,10 +68,10 @@ export default function Sidebar({ onOpenSearch }) {
             className={({ isActive }) =>
               `mycelium-link group flex items-center gap-3 pl-4 pr-2 py-2 text-sm relative ${isActive ? "active" : ""}`
             }
-            data-testid={n.testid}
+            data-testid={`nav-${n.key}`}
           >
             <n.icon size={14} strokeWidth={1.4} className="opacity-70 group-hover:opacity-100" />
-            <span className="font-heading tracking-wide">{n.label}</span>
+            <span className="font-heading tracking-wide">{labels[n.key] || n.label}</span>
           </NavLink>
         ))}
       </nav>

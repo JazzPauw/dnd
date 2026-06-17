@@ -26,7 +26,7 @@ export default function Characters() {
   return (
     <div data-testid="characters-page">
       <PageHeader title="Characters" subtitle="Multiple vessels. Switch between them at the speed of thought."
-        action={<button className="btn-organic" onClick={create} data-testid="character-add"><Plus size={14}/> Awaken</button>} />
+        action={<button className="btn-organic" onClick={create} data-testid="character-add"><Plus size={14}/> New Character</button>} />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {characters.map((c) => (
           <OrganicCard key={c.id} testid={`character-${c.id}`} className="cursor-pointer" onClick={() => selectCharacter(c.id)}>

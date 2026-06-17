@@ -89,6 +89,7 @@ export default function Network() {
           linkDirectionalParticleSpeed={0.004}
           linkDirectionalParticleColor={() => "#b47ee5"}
           nodeCanvasObject={(node, ctx, scale) => {
+            if (!Number.isFinite(node.x) || !Number.isFinite(node.y)) return;
             const r = (node.val || 4);
             const grd = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, r * 3);
             grd.addColorStop(0, node.color);

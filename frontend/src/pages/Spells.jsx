@@ -3,7 +3,16 @@ import OrganicCard from "@/components/OrganicCard";
 import PageHeader from "@/components/PageHeader";
 import { useCharacter } from "@/contexts/CharacterContext";
 import { spells } from "@/lib/api";
-import { Plus, Trash2, Sparkles } from "lucide-react";
+import apiClient from "@/lib/api";
+import { Plus, Trash2, Sparkles, Save, BookmarkPlus } from "lucide-react";
+
+const presetsApi = {
+  list: (p) => apiClient.get("/presets", { params: p }).then((r) => r.data),
+  create: (d) => apiClient.post("/presets", d).then((r) => r.data),
+  update: (id, d) => apiClient.put(`/presets/${id}`, d).then((r) => r.data),
+  remove: (id) => apiClient.delete(`/presets/${id}`).then((r) => r.data),
+  apply: (id) => apiClient.post(`/presets/${id}/apply`).then((r) => r.data),
+};
 
 const SCHOOLS = ["Abjuration","Conjuration","Divination","Enchantment","Evocation","Illusion","Necromancy","Transmutation"];
 
@@ -12,15 +21,30 @@ export default function Spells() {
   const [list, setList] = useState([]);
   const [filter, setFilter] = useState({ q: "", source: "all", prepared: false, concentration: false, ritual: false, level: "all" });
   const [editing, setEditing] = useState(null);
+  const [presets, setPresets] = useState([]);
 
   const load = async () => current && setList(await spells.list({ character_id: current.id }));
-  useEffect(() => { load(); }, [current?.id]);
+  const loadPresets = async () => current && setPresets(await presetsApi.list({ character_id: current.id }));
+  useEffect(() => { load(); loadPresets(); }, [current?.id]);
+
+  const savePreset = async () => {
+    const name = prompt("Preset name? (e.g. 'Forest Combat', 'Healer')");
+    if (!name) return;
+    const spell_ids = list.filter((s) => s.prepared && !s.always_prepared).map((s) => s.id);
+    await presetsApi.create({ character_id: current.id, name, spell_ids });
+    loadPresets();
+  };
+  const applyPreset = async (p) => {
+    await presetsApi.apply(p.id);
+    await load();
+  };
+  const deletePreset = async (id) => { await presetsApi.remove(id); loadPresets(); };
 
   const filtered = useMemo(() => {
     return list.filter((s) => {
       if (filter.q && !`${s.name} ${s.description||""}`.toLowerCase().includes(filter.q.toLowerCase())) return false;
       if (filter.source !== "all" && s.source !== filter.source) return false;
-      if (filter.prepared && !s.prepared) return false;
+      if (filter.prepared && !(s.prepared || s.always_prepared)) return false;
       if (filter.concentration && !s.concentration) return false;
       if (filter.ritual && !s.ritual) return false;
       if (filter.level !== "all" && Number(s.level) !== Number(filter.level)) return false;
@@ -44,7 +68,7 @@ export default function Spells() {
   };
 
   const create = async () => {
-    const fresh = { character_id: current.id, name: "Unnamed Spell", level: 0, source: "druid", school: "Conjuration", casting_time: "1 action", range: "Self", components: "V, S", duration: "Instantaneous", description: "", concentration: false, ritual: false, prepared: false, notes: "" };
+    const fresh = { character_id: current.id, name: "Unnamed Spell", level: 0, source: "druid", school: "Conjuration", casting_time: "1 action", range: "Self", components: "V, S", duration: "Instantaneous", description: "", concentration: false, ritual: false, prepared: false, always_prepared: false, notes: "" };
     const out = await spells.create(fresh);
     await load();
     setEditing(out);
@@ -54,11 +78,11 @@ export default function Spells() {
   if (!current) return null;
   return (
     <div data-testid="spells-page">
-      <PageHeader title="Spell Archive" subtitle="Specimens of woven will. Slots are flesh, spells are spores."
-        action={<button className="btn-organic" onClick={create} data-testid="add-spell"><Plus size={14}/> Inscribe</button>} />
+      <PageHeader title="Spell Archive" subtitle="All prepared spells and rituals — including always-prepared favorites."
+        action={<button className="btn-organic" onClick={create} data-testid="add-spell"><Plus size={14}/> New Spell</button>} />
 
       {/* Spell slots */}
-      <OrganicCard className="mb-6">
+      <OrganicCard className="mb-4">
         <p className="label-arcane mb-3">Spell Slots</p>
         <div className="grid grid-cols-3 sm:grid-cols-9 gap-2">
           {Object.entries(current.spell_slots || {}).map(([lvl, s]) => (
@@ -71,6 +95,23 @@ export default function Spells() {
                 <input type="number" className="font-mono !w-10 text-center !p-1 text-sm" value={s.max} onChange={(e) => setSlotMax(lvl, e.target.value)} data-testid={`slot-max-${lvl}`} />
                 <button className="btn-ghost px-1 py-0 text-xs" onClick={() => adjustSlot(lvl, +1)} data-testid={`slot-inc-${lvl}`}>+</button>
               </div>
+            </div>
+          ))}
+        </div>
+      </OrganicCard>
+
+      {/* Presets / Loadouts */}
+      <OrganicCard className="mb-6" testid="presets-panel">
+        <div className="flex items-center justify-between mb-2">
+          <p className="label-arcane">Prepared Presets</p>
+          <button className="btn-organic !py-1 !px-2 text-xs" onClick={savePreset} data-testid="preset-save"><BookmarkPlus size={12}/> Save current as preset</button>
+        </div>
+        {presets.length === 0 && <p className="text-xs italic text-[var(--text-tertiary)]">No presets yet. Set prepared spells then click "Save current as preset".</p>}
+        <div className="flex flex-wrap gap-2 mt-2">
+          {presets.map((p) => (
+            <div key={p.id} className="flex items-center gap-1 border border-white/10 px-2 py-1 text-xs" data-testid={`preset-${p.id}`}>
+              <button onClick={() => applyPreset(p)} className="font-heading hover:text-[var(--text-magical)]" data-testid={`preset-apply-${p.id}`}>{p.name} <span className="text-[var(--text-tertiary)]">({(p.spell_ids||[]).length})</span></button>
+              <button onClick={() => deletePreset(p.id)} className="text-[var(--text-tertiary)] hover:text-[var(--accent-blood)] ml-1" data-testid={`preset-delete-${p.id}`}><Trash2 size={10}/></button>
             </div>
           ))}
         </div>
@@ -101,7 +142,8 @@ export default function Spells() {
             </div>
             <p className="text-sm mt-2 line-clamp-2">{s.description}</p>
             <div className="flex gap-2 mt-3 text-[10px] uppercase tracking-wider">
-              {s.prepared && <span className="text-[var(--accent-spore)]">●prepared</span>}
+              {s.always_prepared && <span className="text-[var(--text-magical)]">●always</span>}
+              {s.prepared && !s.always_prepared && <span className="text-[var(--accent-spore)]">●prepared</span>}
               {s.concentration && <span className="text-amber-400">●conc</span>}
               {s.ritual && <span className="text-[var(--text-magical)]">●ritual</span>}
             </div>
@@ -132,10 +174,10 @@ export default function Spells() {
               <label className="text-sm flex items-center gap-1"><input type="checkbox" className="!w-3" checked={!!editing.ritual} onChange={(e) => setEditing({ ...editing, ritual: e.target.checked })}/> ritual</label>
             </div>
             <div className="flex justify-between gap-2 mt-4">
-              <button className="btn-danger" onClick={async () => { await spells.remove(editing.id); await load(); setEditing(null); }} data-testid="spell-delete"><Trash2 size={12}/> Burn</button>
+              <button className="btn-danger" onClick={async () => { await spells.remove(editing.id); await load(); setEditing(null); }} data-testid="spell-delete"><Trash2 size={12}/> Delete</button>
               <div className="flex gap-2">
                 <button className="btn-ghost" onClick={() => setEditing(null)}>Cancel</button>
-                <button className="btn-organic" onClick={save} data-testid="spell-save">Preserve</button>
+                <button className="btn-organic" onClick={save} data-testid="spell-save">Save</button>
               </div>
             </div>
           </OrganicCard>

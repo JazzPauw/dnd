@@ -54,7 +54,7 @@ export default function Themes() {
                 <span key={i} className="w-7 h-7 border border-white/10" style={{ background: c }} />
               ))}
             </div>
-            <button onClick={(e) => { e.stopPropagation(); assign(t); }} className="btn-ghost mt-3 text-xs" data-testid={`theme-assign-${t.id}`}>Wear</button>
+            <button onClick={(e) => { e.stopPropagation(); assign(t); }} className="btn-ghost mt-3 text-xs" data-testid={`theme-assign-${t.id}`}>Apply</button>
           </OrganicCard>
         ))}
       </div>
@@ -80,7 +80,7 @@ export default function Themes() {
               {editing.id !== DEFAULT_THEME.id ? <button className="btn-danger" onClick={remove}><Trash2 size={12}/> Delete</button> : <span/>}
               <div className="flex gap-2">
                 <button className="btn-ghost" onClick={() => setEditing(null)}>Cancel</button>
-                <button className="btn-organic" onClick={save} disabled={editing.id === DEFAULT_THEME.id} data-testid="theme-save">Preserve</button>
+                <button className="btn-organic" onClick={save} disabled={editing.id === DEFAULT_THEME.id} data-testid="theme-save">Save</button>
               </div>
             </div>
           </OrganicCard>

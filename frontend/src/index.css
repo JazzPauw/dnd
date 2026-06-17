@@ -108,19 +108,9 @@ body::before {
   transition: border-color 0.4s ease, box-shadow 0.6s ease, transform 0.4s ease;
   overflow: hidden;
 }
-.organic-card::after {
-  /* hover spore glow tracking mouse via CSS var */
-  content: "";
-  position: absolute; inset: 0;
-  pointer-events: none;
-  background: radial-gradient(300px circle at var(--mx, 50%) var(--my, 50%), rgba(157,76,221,0.18), transparent 60%);
-  opacity: 0; transition: opacity 0.5s ease;
-}
 .organic-card:hover { border-color: rgba(157,76,221,0.35); box-shadow: 0 0 40px -10px rgba(157,76,221,0.25); }
-.organic-card:hover::after { opacity: 1; }
 
 .organic-card.forbidden { background: var(--bg-forbidden); border-color: rgba(92,26,26,0.4); }
-.organic-card.forbidden::after { background: radial-gradient(300px circle at var(--mx, 50%) var(--my, 50%), rgba(180,40,40,0.2), transparent 60%); }
 
 .fungal-divider {
   border: none;

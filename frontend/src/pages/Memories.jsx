@@ -21,7 +21,7 @@ export default function Memories() {
   useEffect(() => { load(); }, [current?.id]);
 
   const create = async () => {
-    const out = await memories.create({ character_id: current.id, title: "Untitled memory", date: "", description: "", location: "", characters: "", significance: 3, truth: "certain" });
+    const out = await memories.create({ character_id: current.id, title: "Untitled memory", date: "", description: "", location: "", characters: "", significance: 3, truth: "certain", image: "", connections: [] });
     await load(); setEditing(out);
   };
   const save = async () => { await memories.update(editing.id, editing); await load(); setEditing(null); };
@@ -30,19 +30,23 @@ export default function Memories() {
   if (!current) return null;
   return (
     <div data-testid="memories-page">
-      <PageHeader title="Memories" subtitle="Glowing nodes in a network of self. Some pulse brighter than others."
-        action={<button className="btn-organic" onClick={create} data-testid="memory-add"><Plus size={14}/> Imprint</button>} />
+      <PageHeader title="Memories" subtitle="Important moments. Click an entry to connect it to others."
+        action={<button className="btn-organic" onClick={create} data-testid="memory-add"><Plus size={14}/> New Memory</button>} />
 
       {/* Constellation layout */}
       <div className="relative min-h-[500px] bg-black/20 border border-white/5 p-6" data-testid="memory-constellation">
-        <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
-          {items.length > 1 && items.map((m, i) => {
-            const next = items[(i + 1) % items.length];
+        <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ zIndex: 0 }}>
+          {items.flatMap((m, i) => {
             const a = nodePos(i, items.length);
-            const b = nodePos((i + 1) % items.length, items.length);
-            return (
-              <path key={m.id} d={`M ${a.x}% ${a.y}% Q 50% 50% ${b.x}% ${b.y}%`} fill="none" stroke="var(--accent-mycelium)" strokeWidth="0.6" opacity="0.6" />
-            );
+            const connIds = m.connections || [];
+            return connIds.map((cid) => {
+              const j = items.findIndex((x) => x.id === cid);
+              if (j === -1) return null;
+              const b = nodePos(j, items.length);
+              return (
+                <path key={`${m.id}-${cid}`} d={`M ${a.x} ${a.y} Q 50 50 ${b.x} ${b.y}`} fill="none" stroke="var(--accent-glow)" strokeWidth="0.25" opacity="0.7" />
+              );
+            });
           })}
         </svg>
         {items.length === 0 && <p className="italic text-[var(--text-tertiary)] text-sm">No memories. The network forgets quickly.</p>}
@@ -90,10 +94,29 @@ export default function Memories() {
               <label className="col-span-2"><span className="label-arcane">Description</span><textarea rows={5} value={editing.description} onChange={(e) => setEditing({ ...editing, description: e.target.value })}/></label>
               <label><span className="label-arcane">Emotional significance (1–5)</span><input type="number" min={1} max={5} value={editing.significance} onChange={(e) => setEditing({ ...editing, significance: Number(e.target.value) })}/></label>
               <label><span className="label-arcane">Truth status</span><select value={editing.truth} onChange={(e) => setEditing({ ...editing, truth: e.target.value })}>{TRUTH.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}</select></label>
+              <label className="col-span-2"><span className="label-arcane">Image URL</span><input value={editing.image || ""} onChange={(e) => setEditing({ ...editing, image: e.target.value })} data-testid="memory-edit-image"/></label>
+              {editing.image && <img src={editing.image} alt="" className="col-span-2 max-h-48 object-cover" />}
+              <div className="col-span-2">
+                <span className="label-arcane block mb-1">Connected memories (click to toggle)</span>
+                <div className="flex flex-wrap gap-1" data-testid="memory-connections">
+                  {items.filter((m) => m.id !== editing.id).map((m) => {
+                    const active = (editing.connections || []).includes(m.id);
+                    return (
+                      <button key={m.id} type="button" onClick={() => {
+                        const conn = new Set(editing.connections || []);
+                        if (active) conn.delete(m.id); else conn.add(m.id);
+                        setEditing({ ...editing, connections: [...conn] });
+                      }} className={`text-xs px-2 py-1 border ${active ? "border-[var(--accent-glow)] text-[var(--text-magical)]" : "border-white/10 text-[var(--text-secondary)]"}`}>
+                        {m.title}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
             <div className="flex justify-between gap-2 mt-4">
-              <button className="btn-danger" onClick={remove}><Trash2 size={12}/> Forget</button>
-              <div className="flex gap-2"><button className="btn-ghost" onClick={() => setEditing(null)}>Cancel</button><button className="btn-organic" onClick={save} data-testid="memory-save">Preserve</button></div>
+              <button className="btn-danger" onClick={remove}><Trash2 size={12}/> Delete</button>
+              <div className="flex gap-2"><button className="btn-ghost" onClick={() => setEditing(null)}>Cancel</button><button className="btn-organic" onClick={save} data-testid="memory-save">Save</button></div>
             </div>
           </OrganicCard>
         </div>

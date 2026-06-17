@@ -26,8 +26,8 @@ export default function CycleOfDeath() {
     <div data-testid="cycle-page" className="relative">
       <MushroomDecor position="bottom-left" opacity={0.22} />
       <MushroomDecor position="bottom-right" opacity={0.16} />
-      <PageHeader title="Cycle of Death" subtitle="This is not a graveyard. This is a garden. From every death, something rises."
-        action={<button className="btn-organic" onClick={create} data-testid="death-add"><Plus size={14}/> Inter</button>} />
+      <PageHeader title="Cycle of Death" subtitle="Not a graveyard — a garden. From every death, something grows."
+        action={<button className="btn-organic" onClick={create} data-testid="death-add"><Plus size={14}/> New Entry</button>} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {items.length === 0 && <p className="italic text-[var(--text-tertiary)] text-sm">The garden waits for its first bloom.</p>}
@@ -57,8 +57,8 @@ export default function CycleOfDeath() {
               <label className="col-span-2"><span className="label-arcane">Personal thoughts</span><textarea rows={4} value={editing.thoughts} onChange={(e) => setEditing({ ...editing, thoughts: e.target.value })}/></label>
             </div>
             <div className="flex justify-between gap-2 mt-4">
-              <button className="btn-danger" onClick={remove}><Trash2 size={12}/> Release</button>
-              <div className="flex gap-2"><button className="btn-ghost" onClick={() => setEditing(null)}>Cancel</button><button className="btn-organic" onClick={save} data-testid="death-save">Preserve</button></div>
+              <button className="btn-danger" onClick={remove}><Trash2 size={12}/> Delete</button>
+              <div className="flex gap-2"><button className="btn-ghost" onClick={() => setEditing(null)}>Cancel</button><button className="btn-organic" onClick={save} data-testid="death-save">Save</button></div>
             </div>
           </OrganicCard>
         </div>

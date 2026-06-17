@@ -637,6 +637,75 @@ async def search(character_id: str, q: str):
     return results
 
 
+# ============================================================
+# Roll Macros
+# ============================================================
+
+
+@api.get("/macros")
+async def list_macros(character_id: str):
+    return await _list("macros", character_id)
+
+
+@api.post("/macros")
+async def create_macro(payload: Dict[str, Any]):
+    return await _create("macros", payload)
+
+
+@api.put("/macros/{mid}")
+async def update_macro(mid: str, payload: Dict[str, Any]):
+    return await _update("macros", mid, payload)
+
+
+@api.delete("/macros/{mid}")
+async def delete_macro(mid: str):
+    return await _delete("macros", mid)
+
+
+# ============================================================
+# Spell Presets (prepared loadouts)
+# ============================================================
+
+
+@api.get("/presets")
+async def list_presets(character_id: str):
+    return await _list("presets", character_id)
+
+
+@api.post("/presets")
+async def create_preset(payload: Dict[str, Any]):
+    return await _create("presets", payload)
+
+
+@api.put("/presets/{pid}")
+async def update_preset(pid: str, payload: Dict[str, Any]):
+    return await _update("presets", pid, payload)
+
+
+@api.delete("/presets/{pid}")
+async def delete_preset(pid: str):
+    return await _delete("presets", pid)
+
+
+@api.post("/presets/{pid}/apply")
+async def apply_preset(pid: str):
+    """Sets `prepared=True` on spells listed in preset.spell_ids, False on others (of same character)."""
+    preset = await _get("presets", pid)
+    cid = preset.get("character_id")
+    spell_ids = set(preset.get("spell_ids", []))
+    spells_list = await db.spells.find({"character_id": cid}, {"_id": 0}).to_list(5000)
+    for sp in spells_list:
+        # always_prepared spells stay prepared regardless
+        if sp.get("always_prepared"):
+            continue
+        await db.spells.update_one(
+            {"id": sp["id"]},
+            {"$set": {"prepared": sp["id"] in spell_ids, "updated_at": now_iso()}},
+        )
+    await _log_ledger(cid, "preset", f"Loaded preset '{preset.get('name', 'preset')}'")
+    return {"ok": True}
+
+
 @api.get("/")
 async def root():
     return {"name": "The Mycelial Archive", "status": "alive"}

@@ -86,7 +86,7 @@ export default function EntityPage({ title, subtitle, api, fields, render, testi
               <button className="btn-danger" onClick={remove} data-testid={`${testidPrefix}-delete`}><Trash2 size={12}/> Delete</button>
               <div className="flex gap-2">
                 <button className="btn-ghost" onClick={() => setEditing(null)}>Cancel</button>
-                <button className="btn-organic" onClick={save} data-testid={`${testidPrefix}-save`}>Preserve</button>
+                <button className="btn-organic" onClick={save} data-testid={`${testidPrefix}-save`}>Save</button>
               </div>
             </div>
           </OrganicCard>

@@ -34,7 +34,7 @@ export default function Apothecary() {
   return (
     <div data-testid="apothecary-page">
       <PageHeader title="Apothecary" subtitle="Recipes. Tinctures. Things that should not be brewed."
-        action={<button className="btn-organic" onClick={create} data-testid="recipe-add"><Plus size={14}/> Brew</button>} />
+        action={<button className="btn-organic" onClick={create} data-testid="recipe-add"><Plus size={14}/> New Recipe</button>} />
 
       <div className="flex gap-1 mb-4">
         {CATEGORIES.map((c) => (
@@ -75,8 +75,8 @@ export default function Apothecary() {
               <label className="col-span-2"><span className="label-arcane">Notes</span><textarea rows={2} value={editing.notes} onChange={(e) => setEditing({ ...editing, notes: e.target.value })} /></label>
             </div>
             <div className="flex justify-between gap-2 mt-4">
-              <button className="btn-danger" onClick={remove}><Trash2 size={12}/> Discard</button>
-              <div className="flex gap-2"><button className="btn-ghost" onClick={() => setEditing(null)}>Cancel</button><button className="btn-organic" onClick={save} data-testid="recipe-save">Preserve</button></div>
+              <button className="btn-danger" onClick={remove}><Trash2 size={12}/> Delete</button>
+              <div className="flex gap-2"><button className="btn-ghost" onClick={() => setEditing(null)}>Cancel</button><button className="btn-organic" onClick={save} data-testid="recipe-save">Save</button></div>
             </div>
           </OrganicCard>
         </div>

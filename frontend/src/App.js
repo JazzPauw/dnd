@@ -19,6 +19,10 @@ import Network from "@/pages/Network";
 import Ledger from "@/pages/Ledger";
 import Themes from "@/pages/Themes";
 import Characters from "@/pages/Characters";
+import Inventory from "@/pages/Inventory";
+import Macros from "@/pages/Macros";
+import Settings from "@/pages/Settings";
+import { Toaster } from "sonner";
 import { Printer } from "lucide-react";
 
 function Shell() {
@@ -47,8 +51,8 @@ function Shell() {
       <div className="app-shell flex">
         <Sidebar onOpenSearch={() => setPaletteOpen(true)} />
         <main className="flex-1 p-8 max-w-[1400px] mx-auto" data-testid="main-content">
-          <div className="flex justify-end mb-2 no-print">
-            <button onClick={() => window.print()} className="btn-ghost text-xs" data-testid="export-pdf-btn"><Printer size={12}/> Export PDF</button>
+          <div className="flex justify-end mb-2 no-print gap-2">
+            <button onClick={() => window.print()} className="btn-ghost text-xs" data-testid="export-pdf-btn"><Printer size={12}/> Export this page</button>
           </div>
           <Routes>
             <Route path="/" element={<Dashboard />} />
@@ -65,10 +69,14 @@ function Shell() {
             <Route path="/ledger" element={<Ledger />} />
             <Route path="/themes" element={<Themes />} />
             <Route path="/characters" element={<Characters />} />
+            <Route path="/inventory" element={<Inventory />} />
+            <Route path="/macros" element={<Macros />} />
+            <Route path="/settings" element={<Settings />} />
           </Routes>
         </main>
       </div>
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
+      <Toaster theme="dark" position="bottom-right" />
     </>
   );
 }

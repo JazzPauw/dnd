@@ -1,115 +1,265 @@
+/* The Mycelial Archive — Global Styles */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-    margin: 0;
-    font-family:
-        -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-        "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-        sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+@import url('https://fonts.googleapis.com/css2?family=Gloock&family=Cormorant+Garamond:wght@400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  /* Mycelial palette — defaults, can be overridden by ThemeProvider */
+  --bg-base: #070907;
+  --bg-surface: #101411;
+  --bg-surface-hover: #171d19;
+  --bg-glass: rgba(16, 20, 17, 0.7);
+  --bg-forbidden: #050305;
+
+  --accent-glow: #9d4cdd;
+  --accent-spore: #b47ee5;
+  --accent-toxic: #2b472a;
+  --accent-mycelium: #4a4d46;
+  --accent-bark: #3e362e;
+  --accent-blood: #5c1a1a;
+
+  --text-primary: #e4dcd3;
+  --text-secondary: #a8a29a;
+  --text-tertiary: #6c665f;
+  --text-magical: #c69bf1;
+
+  --font-arcane: 'Gloock', serif;
+  --font-heading: 'Cormorant Garamond', serif;
+  --font-body: 'Crimson Text', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* shadcn tokens mapped to mycelial palette so default UI primitives feel native */
+  --background: 90 8% 4%;
+  --foreground: 32 22% 86%;
+  --card: 100 7% 7%;
+  --card-foreground: 32 22% 86%;
+  --popover: 100 7% 7%;
+  --popover-foreground: 32 22% 86%;
+  --primary: 277 64% 58%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 120 4% 12%;
+  --secondary-foreground: 32 22% 86%;
+  --muted: 120 4% 12%;
+  --muted-foreground: 33 8% 64%;
+  --accent: 120 4% 14%;
+  --accent-foreground: 32 22% 86%;
+  --destructive: 0 56% 23%;
+  --destructive-foreground: 32 22% 86%;
+  --border: 33 7% 18%;
+  --input: 33 7% 18%;
+  --ring: 277 64% 58%;
+  --radius: 2px;
 }
 
-code {
-    font-family:
-        source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+* { border-color: hsl(var(--border)); }
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
-@layer base {
-    :root {
-        --background: 0 0% 100%;
-        --foreground: 0 0% 3.9%;
-        --card: 0 0% 100%;
-        --card-foreground: 0 0% 3.9%;
-        --popover: 0 0% 100%;
-        --popover-foreground: 0 0% 3.9%;
-        --primary: 0 0% 9%;
-        --primary-foreground: 0 0% 98%;
-        --secondary: 0 0% 96.1%;
-        --secondary-foreground: 0 0% 9%;
-        --muted: 0 0% 96.1%;
-        --muted-foreground: 0 0% 45.1%;
-        --accent: 0 0% 96.1%;
-        --accent-foreground: 0 0% 9%;
-        --destructive: 0 84.2% 60.2%;
-        --destructive-foreground: 0 0% 98%;
-        --border: 0 0% 89.8%;
-        --input: 0 0% 89.8%;
-        --ring: 0 0% 3.9%;
-        --chart-1: 12 76% 61%;
-        --chart-2: 173 58% 39%;
-        --chart-3: 197 37% 24%;
-        --chart-4: 43 74% 66%;
-        --chart-5: 27 87% 67%;
-        --radius: 0.5rem;
-    }
-    .dark {
-        --background: 0 0% 3.9%;
-        --foreground: 0 0% 98%;
-        --card: 0 0% 3.9%;
-        --card-foreground: 0 0% 98%;
-        --popover: 0 0% 3.9%;
-        --popover-foreground: 0 0% 98%;
-        --primary: 0 0% 98%;
-        --primary-foreground: 0 0% 9%;
-        --secondary: 0 0% 14.9%;
-        --secondary-foreground: 0 0% 98%;
-        --muted: 0 0% 14.9%;
-        --muted-foreground: 0 0% 63.9%;
-        --accent: 0 0% 14.9%;
-        --accent-foreground: 0 0% 98%;
-        --destructive: 0 62.8% 30.6%;
-        --destructive-foreground: 0 0% 98%;
-        --border: 0 0% 14.9%;
-        --input: 0 0% 14.9%;
-        --ring: 0 0% 83.1%;
-        --chart-1: 220 70% 50%;
-        --chart-2: 160 60% 45%;
-        --chart-3: 30 80% 55%;
-        --chart-4: 280 65% 60%;
-        --chart-5: 340 75% 55%;
-    }
+body::before {
+  /* Subtle grain noise overlay across the whole page */
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/></svg>");
 }
 
-@layer base {
-    * {
-        @apply border-border;
-    }
-    body {
-        @apply bg-background text-foreground;
-    }
+/* Selection */
+::selection { background: var(--accent-glow); color: #fff; }
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--accent-mycelium); border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-glow); }
+
+/* Reusable mycelial classes */
+.font-arcane { font-family: var(--font-arcane); letter-spacing: -0.01em; }
+.font-heading { font-family: var(--font-heading); }
+.font-body { font-family: var(--font-body); }
+.font-mono { font-family: var(--font-mono); }
+
+.label-arcane {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
 }
 
-@layer base {
-    [data-debug-wrapper="true"] {
-        display: contents !important;
-    }
-
-    [data-debug-wrapper="true"] > * {
-        margin-left: inherit;
-        margin-right: inherit;
-        margin-top: inherit;
-        margin-bottom: inherit;
-        padding-left: inherit;
-        padding-right: inherit;
-        padding-top: inherit;
-        padding-bottom: inherit;
-        column-gap: inherit;
-        row-gap: inherit;
-        gap: inherit;
-        border-left-width: inherit;
-        border-right-width: inherit;
-        border-top-width: inherit;
-        border-bottom-width: inherit;
-        border-left-style: inherit;
-        border-right-style: inherit;
-        border-top-style: inherit;
-        border-bottom-style: inherit;
-        border-left-color: inherit;
-        border-right-color: inherit;
-        border-top-color: inherit;
-        border-bottom-color: inherit;
-    }
+.organic-card {
+  position: relative;
+  background: var(--bg-surface);
+  border: 1px solid rgba(168, 162, 154, 0.08);
+  border-radius: 2px;
+  padding: 1.5rem;
+  transition: border-color 0.4s ease, box-shadow 0.6s ease, transform 0.4s ease;
+  overflow: hidden;
 }
+.organic-card:hover { border-color: rgba(157,76,221,0.35); box-shadow: 0 0 40px -10px rgba(157,76,221,0.25); }
+
+.organic-card.forbidden { background: var(--bg-forbidden); border-color: rgba(92,26,26,0.4); }
+
+.fungal-divider {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-mycelium) 30%, var(--accent-glow) 50%, var(--accent-mycelium) 70%, transparent);
+  opacity: 0.4;
+}
+
+.glow-text { color: var(--accent-spore); text-shadow: 0 0 12px rgba(157,76,221,0.55); }
+
+.mycelium-link {
+  position: relative;
+  color: var(--text-secondary);
+  transition: color 0.3s ease;
+}
+.mycelium-link:hover { color: var(--text-magical); }
+.mycelium-link::before {
+  content: ""; position: absolute; left: -14px; top: 50%;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent-glow);
+  box-shadow: 0 0 10px var(--accent-glow);
+  transform: translateY(-50%) scale(0); transition: transform 0.4s ease;
+}
+.mycelium-link.active { color: var(--text-magical); }
+.mycelium-link.active::before { transform: translateY(-50%) scale(1); }
+
+/* HP bar */
+.hp-bar {
+  position: relative;
+  height: 10px;
+  background: rgba(255,255,255,0.04);
+  overflow: hidden;
+  border-radius: 1px;
+}
+.hp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-blood) 0%, var(--accent-bark) 40%, var(--accent-toxic) 100%);
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 14px rgba(157,76,221,0.3);
+}
+
+/* Grow-in animation for mounted cards */
+@keyframes grow-in {
+  0% { opacity: 0; transform: translateY(8px) scale(0.98); filter: blur(4px); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+.grow-in { animation: grow-in 0.65s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(157,76,221,0.4); }
+  50% { box-shadow: 0 0 22px rgba(157,76,221,0.85); }
+}
+.pulse-glow { animation: pulse-glow 3.6s ease-in-out infinite; }
+
+@keyframes spore-burst {
+  0% { opacity: 0; transform: scale(0.6); }
+  60% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.6); }
+}
+.spore-burst { position: fixed; pointer-events: none; z-index: 80; animation: spore-burst 1.6s ease-out forwards; }
+
+/* Inputs — minimal organic style */
+input, textarea, select {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(168, 162, 154, 0.12);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  padding: 0.5rem 0.75rem;
+  border-radius: 2px;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 0 1px rgba(157,76,221,0.35);
+}
+textarea { font-family: var(--font-body); min-height: 80px; resize: vertical; }
+
+button { font-family: var(--font-heading); }
+
+.btn-organic {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  background: rgba(157,76,221,0.08);
+  border: 1px solid rgba(157,76,221,0.35);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+.btn-organic:hover {
+  background: rgba(157,76,221,0.18);
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 22px -4px rgba(157,76,221,0.6);
+}
+.btn-ghost { background: transparent; border: 1px solid rgba(168,162,154,0.18); color: var(--text-secondary); }
+.btn-ghost:hover { color: var(--text-magical); border-color: var(--accent-glow); }
+.btn-danger { background: rgba(92,26,26,0.1); border-color: rgba(180,40,40,0.4); color: #e0a8a8; }
+.btn-danger:hover { background: rgba(92,26,26,0.25); border-color: rgba(220,80,80,0.6); }
+
+/* Spore canvas always sits behind UI */
+.spore-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+/* Main app layout */
+.app-shell { position: relative; z-index: 2; min-height: 100vh; }
+
+/* Print styles for PDF export */
+@media print {
+  body, html { background: #070907 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .no-print { display: none !important; }
+  .organic-card { break-inside: avoid; page-break-inside: avoid; box-shadow: none !important; }
+  .spore-canvas { display: none !important; }
+  body::before { display: none !important; }
+  /* Multi-select print: if any .print-selected exists in main, hide its unselected siblings */
+  body.print-selection-mode [data-print-card]:not(.print-selected) { display: none !important; }
+  /* Per-entry print: only show the selected card */
+  body.print-entry-mode [data-print-card]:not(.print-selected) { display: none !important; }
+  body.print-entry-mode .print-selected {
+    position: static !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-shadow: none !important;
+  }
+  body.print-entry-mode [data-entry-modal-backdrop] {
+    position: static !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+}
+
+/* Print-safe (white) toggle — forces black on white with no shadows */
+body.print-safe,
+body.print-safe * {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #000000 !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+  border-color: #000000 !important;
+}
+body.print-safe .spore-canvas,
+body.print-safe .no-print { display: none !important; }
+body.print-safe::before { display: none !important; }

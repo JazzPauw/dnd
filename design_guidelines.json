@@ -1,0 +1,133 @@
+{
+  "theme": "dark",
+  "archetype": "5 (Luxury/Moody) - Adapted for Dark Fantasy Organic",
+  "domain": "Gaming / RPG Wiki / Lore Companion",
+  "atmosphere": "Ancient, Dark fantasy, Melancholic, Organic, Mysterious, Alive",
+  "colors": {
+    "background": {
+      "base": "#070907",
+      "surface": "#101411",
+      "surface_hover": "#171d19",
+      "surface_glass": "rgba(16, 20, 17, 0.7)",
+      "surface_forbidden": "#050305"
+    },
+    "accents": {
+      "primary_glow": "#9D4CDD",
+      "spore_light": "#B47EE5",
+      "toxic_green": "#2B472A",
+      "mycelium_thread": "#4A4D46",
+      "bark_brown": "#3E362E",
+      "blood_red": "#5C1A1A"
+    },
+    "text": {
+      "primary": "#E4DCD3",
+      "secondary": "#A8A29A",
+      "tertiary": "#6C665F",
+      "magical": "#C69BF1"
+    },
+    "status": {
+      "hp_high": "#2B472A",
+      "hp_medium": "#8A6D3B",
+      "hp_low": "#5C1A1A"
+    }
+  },
+  "typography": {
+    "fonts": {
+      "heading_arcane": "'Gloock', serif",
+      "heading_standard": "'Cormorant Garamond', serif",
+      "body": "'Crimson Text', serif",
+      "mono_stats": "'JetBrains Mono', monospace"
+    },
+    "sizes": {
+      "h1": "text-5xl sm:text-6xl tracking-tighter",
+      "h2": "text-3xl sm:text-4xl tracking-tight",
+      "h3": "text-2xl",
+      "body_lg": "text-lg leading-relaxed",
+      "body": "text-base leading-relaxed",
+      "label": "text-sm tracking-[0.15em] uppercase font-mono_stats",
+      "tiny": "text-xs tracking-wider"
+    },
+    "rules": {
+      "h1_h2": "Never center unless it's a dramatic lore reveal. Left-aligned for utility. High contrast.",
+      "body": "Left aligned, generous line-height for readability during fast gameplay.",
+      "labels": "Use mono font for stats, AC, HP numbers to contrast the heavily organic serif."
+    }
+  },
+  "layout_and_spacing": {
+    "general": "Generous organic spacing. Use padding scale (p-6, p-8, p-12) to let the dark void breathe. The container must feel like stepping into a cavern.",
+    "grids": {
+      "dashboard_bento": "Control Room style for Living Body. Strict grid (grid-cols-1 md:grid-cols-4 lg:grid-cols-6) with dense functional packing, but visual edges are soft and organic.",
+      "gallery": "Tetris style for Bestiary/Fungarium. Mixed spans to feel like an unkempt garden."
+    },
+    "borders": "1px solid rgba(168, 162, 154, 0.1). Some borders should be completely hidden, relying on ambient shadow/glow.",
+    "border_radius": "rounded-none or slightly irregular rounded-sm to mimic bark and raw paper."
+  },
+  "components": {
+    "living_body_dashboard": {
+      "description": "Ergonomic but alive. Focuses on HP, AC, Resources.",
+      "hp_bar": "A living entity. No flat colors. A dark red to toxic green gradient that subtly pulses. When damaged, the bar 'rots' (turns dark brown/black).",
+      "rest_buttons": "Dark bark texture. On hover: emits a subtle purple spore glow. On click: 'The Network feeds. Flesh restored.' text flashes briefly.",
+      "structure": "Bento grid with high data density. Uses monospace for actual numbers."
+    },
+    "memory_graph_nodes": {
+      "description": "Interactive graph of the character's memories and connections.",
+      "library": "d3.js or react-force-graph-2d. Must be performant.",
+      "nodes": "Glowing purple orbs (using primary_glow). Size varies by memory significance.",
+      "links": "Curved SVG lines (stroke: mycelium_thread) that have a faint opacity pulse, simulating nutrients flowing.",
+      "interaction": "Hovering a node illuminates its connected mycelium threads. Background is completely transparent to blend with the app void."
+    },
+    "bestiary_card": {
+      "description": "Cards for creatures encountered.",
+      "background": "surface color (#101411) with a very faint noise texture.",
+      "decorations": "Absolute positioned SVG mushrooms or root vectors in the top-right or bottom-left corners that 'grow' on load.",
+      "typography": "Creature name in Gloock. Stats in JetBrains Mono. Lore in Crimson Text."
+    },
+    "apothecary_recipe": {
+      "description": "Crafting recipes for potions/poisons.",
+      "standard": "Muted green accents. Bark borders.",
+      "forbidden": "Background changes to surface_forbidden (#050305). Text glows slightly red. The purple spore accent becomes a sicklier magenta."
+    },
+    "navigation": {
+      "type": "Command Palette (Cmd+K) heavily prioritized for fast D&D session switching. Side navigation is a thin vertical tree-like structure.",
+      "active_state": "A small glowing fungal node appears next to the active link."
+    }
+  },
+  "motion_and_interactions": {
+    "spore_particles": "Global background effect. Small div/canvas particles moving slowly upwards. Opacity varies (0.1 to 0.4). They avoid the mouse cursor slightly.",
+    "mycelium_growth": "When a new section mounts, use Framer Motion to draw SVG paths (stroke-dashoffset animation) over 1.5s, simulating roots claiming the page.",
+    "hover_spores": "Cards have a radial gradient mask on hover that reveals a brighter purple glow underneath, tracking the mouse position."
+  },
+  "assets": {
+    "images": [
+      {
+        "category": "hero_background",
+        "description": "Bioluminescent mushrooms glowing in a dark forest",
+        "url": "https://images.unsplash.com/photo-1763321402439-41eb2a0c7e7b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA3MDR8MHwxfHNlYXJjaHwyfHxiaW9sdW1pbmVzY2VudCUyMG11c2hyb29tJTIwZGFyayUyMGZvcmVzdHxlbnwwfHx8fDE3ODE2Nzk3Njh8MA&ixlib=rb-4.1.0&q=85"
+      },
+      {
+        "category": "texture_bark",
+        "description": "Dark roots/mycelium texture for card backgrounds",
+        "url": "https://images.unsplash.com/photo-1590087766505-777ebf5bc0b4?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODF8MHwxfHNlYXJjaHwyfHxteWNlbGl1bSUyMHJvb3RzJTIwdGV4dHVyZSUyMGRhcmt8ZW58MHx8fHwxNzgxNjc5NzY4fDA&ixlib=rb-4.1.0&q=85"
+      },
+      {
+        "category": "spellbook_cover",
+        "description": "Ancient spellbook in dim light",
+        "url": "https://images.unsplash.com/photo-1519884705082-b505c3001e63?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzh8MHwxfHNlYXJjaHwxfHxhbmNpZW50JTIwc3BlbGxib29rJTIwZGFyayUyMGZhbnRhc3l8ZW58MHx8fHwxNzgxNjc5NzY4fDA&ixlib=rb-4.1.0&q=85"
+      }
+    ],
+    "icons": "lucide-react for UI interactions. Use 'Ghost', 'Skull', 'Leaf', 'BookOpen' extensively."
+  },
+  "pdf_export": {
+    "strategy": "Preserve the dark theme visually, but use high resolution rendering via window.print() CSS overrides. Convert background textures to solid dark colors (#070907) to save printer ink if requested, otherwise maintain the full moody presentation for digital sharing. Ensure contrast is slightly boosted in @media print."
+  },
+  "testing": {
+    "requirements": "All interactive elements (buttons, nav links, spell slots, HP inputs) must have data-testid attributes (e.g., data-testid='hp-decrement-button', data-testid='nav-bestiary')."
+  },
+  "instructions_to_main_agent": [
+    "Install framer-motion, lucide-react, and either d3 or react-force-graph-2d.",
+    "Implement the global Spore background as a fixed canvas or framer-motion div layer behind everything (z-[-1]).",
+    "Use standard HTML inputs styled with Tailwind for the character sheet, avoiding Shadcn generic styles.",
+    "Implement a fast Cmd+K command palette for navigation.",
+    "Ensure 'Cormorant Garamond', 'Gloock', and 'Crimson Text' are loaded via Google Fonts."
+  ]
+}

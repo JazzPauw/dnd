@@ -5,6 +5,8 @@ import { useCharacter } from "@/contexts/CharacterContext";
 import { memories } from "@/lib/api";
 import { Plus, Trash2 } from "lucide-react";
 
+import ImageInput from "@/components/ImageInput";
+
 const TRUTH = [
   { value: "certain", label: "Certain", color: "var(--accent-spore)" },
   { value: "fragmented", label: "Fragmented", color: "#c79a5b" },
@@ -94,8 +96,7 @@ export default function Memories() {
               <label className="col-span-2"><span className="label-arcane">Description</span><textarea rows={5} value={editing.description} onChange={(e) => setEditing({ ...editing, description: e.target.value })}/></label>
               <label><span className="label-arcane">Emotional significance (1–5)</span><input type="number" min={1} max={5} value={editing.significance} onChange={(e) => setEditing({ ...editing, significance: Number(e.target.value) })}/></label>
               <label><span className="label-arcane">Truth status</span><select value={editing.truth} onChange={(e) => setEditing({ ...editing, truth: e.target.value })}>{TRUTH.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}</select></label>
-              <label className="col-span-2"><span className="label-arcane">Image URL</span><input value={editing.image || ""} onChange={(e) => setEditing({ ...editing, image: e.target.value })} data-testid="memory-edit-image"/></label>
-              {editing.image && <img src={editing.image} alt="" className="col-span-2 max-h-48 object-cover" />}
+              <label className="col-span-2"><span className="label-arcane">Image</span><ImageInput value={editing.image} onChange={(v) => setEditing({ ...editing, image: v })} testid="memory-image"/></label>
               <div className="col-span-2">
                 <span className="label-arcane block mb-1">Connected memories (click to toggle)</span>
                 <div className="flex flex-wrap gap-1" data-testid="memory-connections">

@@ -4,7 +4,7 @@ import PageHeader from "@/components/PageHeader";
 import { useCharacter } from "@/contexts/CharacterContext";
 import { spells } from "@/lib/api";
 import apiClient from "@/lib/api";
-import { Plus, Trash2, Sparkles, Save, BookmarkPlus } from "lucide-react";
+import { Plus, Trash2, Sparkles, Save, BookmarkPlus, CheckSquare, Square, Printer } from "lucide-react";
 
 const presetsApi = {
   list: (p) => apiClient.get("/presets", { params: p }).then((r) => r.data),
@@ -22,6 +22,16 @@ export default function Spells() {
   const [filter, setFilter] = useState({ q: "", source: "all", prepared: false, concentration: false, ritual: false, level: "all" });
   const [editing, setEditing] = useState(null);
   const [presets, setPresets] = useState([]);
+  const [selectMode, setSelectMode] = useState(false);
+  const [selected, setSelected] = useState(new Set());
+
+  const toggleSel = (id) => {
+    const n = new Set(selected); n.has(id) ? n.delete(id) : n.add(id); setSelected(n);
+  };
+  const printSelected = () => {
+    document.body.classList.add("print-selection-mode");
+    setTimeout(() => { window.print(); setTimeout(() => document.body.classList.remove("print-selection-mode"), 500); }, 50);
+  };
 
   const load = async () => current && setList(await spells.list({ character_id: current.id }));
   const loadPresets = async () => current && setPresets(await presetsApi.list({ character_id: current.id }));
@@ -79,7 +89,13 @@ export default function Spells() {
   return (
     <div data-testid="spells-page">
       <PageHeader title="Spell Archive" subtitle="All prepared spells and rituals — including always-prepared favorites."
-        action={<button className="btn-organic" onClick={create} data-testid="add-spell"><Plus size={14}/> New Spell</button>} />
+        action={
+          <div className="flex gap-2 flex-wrap">
+            <button className="btn-ghost text-xs" onClick={() => { setSelectMode(!selectMode); setSelected(new Set()); }} data-testid="spell-select-toggle">{selectMode ? <CheckSquare size={12}/> : <Square size={12}/>} Select</button>
+            {selectMode && selected.size > 0 && <button className="btn-organic" onClick={printSelected} data-testid="spell-print-selected"><Printer size={12}/> Export {selected.size}</button>}
+            <button className="btn-organic" onClick={create} data-testid="add-spell"><Plus size={14}/> New Spell</button>
+          </div>
+        } />
 
       {/* Spell slots */}
       <OrganicCard className="mb-4">

@@ -13,7 +13,7 @@ const FIELDS = [
   { key: "medicinal_uses", label: "Medicinal uses", type: "textarea", span: 2 },
   { key: "description", label: "Description", type: "textarea", rows: 4, span: 2 },
   { key: "first_discovered", label: "First discovered" },
-  { key: "image", label: "Image URL" },
+  { key: "image", label: "Image", type: "image", span: 2 },
   { key: "notes", label: "Notes", type: "textarea", span: 2 },
 ];
 

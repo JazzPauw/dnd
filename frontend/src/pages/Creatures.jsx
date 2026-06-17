@@ -18,7 +18,7 @@ const FIELDS = [
   { key: "behaviors", label: "Behaviors", type: "textarea", span: 2, rows: 3 },
   { key: "observations", label: "Observations (fungal interactions, etc.)", type: "textarea", span: 2, rows: 4 },
   { key: "encounter_history", label: "Encounter history", type: "textarea", span: 2 },
-  { key: "image", label: "Image URL", span: 2 },
+  { key: "image", label: "Image", span: 2, type: "image" },
 ];
 
 const DANGER_COLOR = {

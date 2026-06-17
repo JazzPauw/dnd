@@ -229,4 +229,6 @@ button { font-family: var(--font-heading); }
   .organic-card { break-inside: avoid; page-break-inside: avoid; box-shadow: none !important; }
   .spore-canvas { display: none !important; }
   body::before { display: none !important; }
+  /* Multi-select print: if any .print-selected exists in main, hide its unselected siblings */
+  body.print-selection-mode [data-print-card]:not(.print-selected) { display: none !important; }
 }

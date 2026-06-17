@@ -4,6 +4,7 @@ import PageHeader from "@/components/PageHeader";
 import MushroomDecor from "@/components/MushroomDecor";
 import { useCharacter } from "@/contexts/CharacterContext";
 import { Plus, Trash2, Pencil } from "lucide-react";
+import ImageInput from "@/components/ImageInput";
 
 /**
  * EntityPage — reusable list+modal CRUD page.
@@ -68,6 +69,8 @@ export default function EntityPage({ title, subtitle, api, fields, render, testi
                   <span className="label-arcane block mb-1">{f.label}</span>
                   {f.type === "textarea" ? (
                     <textarea rows={f.rows || 3} value={editing[f.key] || ""} onChange={(e) => setEditing({ ...editing, [f.key]: e.target.value })} />
+                  ) : f.type === "image" ? (
+                    <ImageInput value={editing[f.key]} onChange={(v) => setEditing({ ...editing, [f.key]: v })} testid={`${testidPrefix}-image`}/>
                   ) : f.type === "select" ? (
                     <select value={editing[f.key] || ""} onChange={(e) => setEditing({ ...editing, [f.key]: e.target.value })}>
                       {f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}

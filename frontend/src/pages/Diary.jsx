@@ -9,7 +9,7 @@ const FIELDS = [
   { key: "date", label: "Date", default: today() },
   { key: "tags", label: "Tags (comma sep)", span: 2 },
   { key: "body", label: "Entry", type: "textarea", rows: 10, span: 2 },
-  { key: "image", label: "Image URL", span: 2 },
+  { key: "image", label: "Image", type: "image", span: 2 },
 ];
 
 export default function Diary() {

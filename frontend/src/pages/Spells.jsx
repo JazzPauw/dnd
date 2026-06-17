@@ -4,7 +4,8 @@ import PageHeader from "@/components/PageHeader";
 import { useCharacter } from "@/contexts/CharacterContext";
 import { spells } from "@/lib/api";
 import apiClient from "@/lib/api";
-import { Plus, Trash2, Sparkles, Save, BookmarkPlus, CheckSquare, Square, Printer } from "lucide-react";
+import { Plus, Trash2, Sparkles, BookmarkPlus, FileDown } from "lucide-react";
+import { exportEntryPdf } from "@/lib/pdfExport";
 
 const presetsApi = {
   list: (p) => apiClient.get("/presets", { params: p }).then((r) => r.data),
@@ -22,21 +23,10 @@ export default function Spells() {
   const [filter, setFilter] = useState({ q: "", source: "all", prepared: false, concentration: false, ritual: false, level: "all" });
   const [editing, setEditing] = useState(null);
   const [presets, setPresets] = useState([]);
-  const [selectMode, setSelectMode] = useState(false);
-  const [selected, setSelected] = useState(new Set());
 
-  const toggleSel = (id) => {
-    const n = new Set(selected); n.has(id) ? n.delete(id) : n.add(id); setSelected(n);
-  };
-  const printSelected = () => {
-    document.body.classList.add("print-selection-mode");
-    setTimeout(() => { window.print(); setTimeout(() => document.body.classList.remove("print-selection-mode"), 500); }, 50);
-  };
-  const printEntry = () => {
-    document.body.classList.add("print-entry-mode");
-    const card = document.querySelector('[data-entry-modal="spell"]');
-    if (card) card.classList.add("print-selected");
-    setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove("print-entry-mode"); if (card) card.classList.remove("print-selected"); }, 500); }, 50);
+  const printEntry = async () => {
+    try { await exportEntryPdf("spell", editing, { character: current }); }
+    catch (err) { console.error("PDF export failed", err); window.alert("PDF export failed: " + (err?.message || err)); }
   };
 
   const load = async () => current && setList(await spells.list({ character_id: current.id }));
@@ -97,8 +87,6 @@ export default function Spells() {
       <PageHeader title="Spell Archive" subtitle="All prepared spells and rituals — including always-prepared favorites."
         action={
           <div className="flex gap-2 flex-wrap">
-            <button className="btn-ghost text-xs" onClick={() => { setSelectMode(!selectMode); setSelected(new Set()); }} data-testid="spell-select-toggle">{selectMode ? <CheckSquare size={12}/> : <Square size={12}/>} Select</button>
-            {selectMode && selected.size > 0 && <button className="btn-organic" onClick={printSelected} data-testid="spell-print-selected"><Printer size={12}/> Export {selected.size}</button>}
             <button className="btn-organic" onClick={create} data-testid="add-spell"><Plus size={14}/> New Spell</button>
           </div>
         } />
@@ -213,7 +201,7 @@ export default function Spells() {
             <div className="flex justify-between gap-2 mt-4">
               <button className="btn-danger" onClick={async () => { await spells.remove(editing.id); await load(); setEditing(null); }} data-testid="spell-delete"><Trash2 size={12}/> Delete</button>
               <div className="flex gap-2">
-                <button className="btn-ghost" onClick={printEntry} data-testid="spell-print-entry"><Printer size={12}/> Export this entry</button>
+                <button className="btn-ghost" onClick={printEntry} data-testid="spell-print-entry"><FileDown size={12}/> Export this entry</button>
                 <button className="btn-ghost" onClick={() => setEditing(null)}>Cancel</button>
                 <button className="btn-organic" onClick={save} data-testid="spell-save">Save</button>
               </div>

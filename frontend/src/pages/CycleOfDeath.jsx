@@ -4,7 +4,8 @@ import PageHeader from "@/components/PageHeader";
 import MushroomDecor from "@/components/MushroomDecor";
 import { useCharacter } from "@/contexts/CharacterContext";
 import { deaths } from "@/lib/api";
-import { Plus, Trash2, Flower2, Printer } from "lucide-react";
+import { Plus, Trash2, Flower2, FileDown } from "lucide-react";
+import { exportEntryPdf } from "@/lib/pdfExport";
 
 export default function CycleOfDeath() {
   const { current } = useCharacter();
@@ -20,11 +21,9 @@ export default function CycleOfDeath() {
   };
   const save = async () => { await deaths.update(editing.id, editing); await load(); setEditing(null); };
   const remove = async () => { if (window.confirm("Let the soil receive them?")) { await deaths.remove(editing.id); await load(); setEditing(null); } };
-  const printEntry = () => {
-    document.body.classList.add("print-entry-mode");
-    const card = document.querySelector('[data-entry-modal="death"]');
-    if (card) card.classList.add("print-selected");
-    setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove("print-entry-mode"); if (card) card.classList.remove("print-selected"); }, 500); }, 50);
+  const printEntry = async () => {
+    try { await exportEntryPdf("death", editing, { character: current }); }
+    catch (err) { console.error("PDF export failed", err); window.alert("PDF export failed: " + (err?.message || err)); }
   };
 
   if (!current) return null;
@@ -64,7 +63,7 @@ export default function CycleOfDeath() {
             </div>
             <div className="flex justify-between gap-2 mt-4">
               <button className="btn-danger" onClick={remove}><Trash2 size={12}/> Delete</button>
-              <div className="flex gap-2"><button className="btn-ghost" onClick={printEntry} data-testid="death-print-entry"><Printer size={12}/> Export this entry</button><button className="btn-ghost" onClick={() => setEditing(null)}>Cancel</button><button className="btn-organic" onClick={save} data-testid="death-save">Save</button></div>
+              <div className="flex gap-2"><button className="btn-ghost" onClick={printEntry} data-testid="death-print-entry"><FileDown size={12}/> Export this entry</button><button className="btn-ghost" onClick={() => setEditing(null)}>Cancel</button><button className="btn-organic" onClick={save} data-testid="death-save">Save</button></div>
             </div>
           </OrganicCard>
         </div>

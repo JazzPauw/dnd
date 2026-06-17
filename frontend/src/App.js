@@ -23,7 +23,7 @@ import Inventory from "@/pages/Inventory";
 import Macros from "@/pages/Macros";
 import Settings from "@/pages/Settings";
 import { Toaster } from "sonner";
-import { Printer } from "lucide-react";
+
 
 function Shell() {
   const { loading, theme } = useCharacter();
@@ -52,16 +52,15 @@ function Shell() {
         <Sidebar onOpenSearch={() => setPaletteOpen(true)} />
         <main className="flex-1 p-8 max-w-[1400px] mx-auto" data-testid="main-content">
           <div className="flex justify-end mb-2 no-print gap-2 items-center">
-            <label className="flex items-center gap-1 text-xs text-[var(--text-secondary)] cursor-pointer" data-testid="print-safe-label">
+            <label className="flex items-center gap-1 text-xs text-[var(--text-secondary)] cursor-pointer" data-testid="print-safe-label" title="When ticked, PDF exports use white paper + black ink instead of the dark mycelial theme.">
               <input
                 type="checkbox"
                 className="!w-3"
                 data-testid="print-safe-toggle"
                 onChange={(e) => document.body.classList.toggle('print-safe', e.target.checked)}
               />
-              Print-safe (white)
+              Light PDF (white paper)
             </label>
-            <button onClick={() => window.print()} className="btn-ghost text-xs" data-testid="export-pdf-btn"><Printer size={12}/> Export this page</button>
           </div>
           <Routes>
             <Route path="/" element={<Dashboard />} />

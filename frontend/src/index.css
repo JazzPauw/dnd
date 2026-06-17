@@ -222,46 +222,11 @@ button { font-family: var(--font-heading); }
 /* Main app layout */
 .app-shell { position: relative; z-index: 2; min-height: 100vh; }
 
-/* Print styles for PDF export */
+/* Minimal print fallback (browser Ctrl+P still works for plain pages, but per-entry export is now via real PDF generator) */
 @media print {
   body, html { background: #070907 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .no-print { display: none !important; }
   .organic-card { break-inside: avoid; page-break-inside: avoid; box-shadow: none !important; }
   .spore-canvas { display: none !important; }
   body::before { display: none !important; }
-  /* Multi-select print: if any .print-selected exists in main, hide its unselected siblings */
-  body.print-selection-mode [data-print-card]:not(.print-selected) { display: none !important; }
-  /* Per-entry print: only show the selected card */
-  body.print-entry-mode [data-print-card]:not(.print-selected) { display: none !important; }
-  body.print-entry-mode .print-selected {
-    position: static !important;
-    max-width: 100% !important;
-    width: 100% !important;
-    box-shadow: none !important;
-  }
-  body.print-entry-mode [data-entry-modal-backdrop] {
-    position: static !important;
-    background: transparent !important;
-    backdrop-filter: none !important;
-    padding: 0 !important;
-    overflow: visible !important;
-    display: block !important;
-  }
-}
-
-/* Print-safe (white) toggle — only affects the printed PDF, not the on-screen view */
-@media print {
-  body.print-safe,
-  body.print-safe * {
-    background: #ffffff !important;
-    background-image: none !important;
-    color: #000000 !important;
-    box-shadow: none !important;
-    text-shadow: none !important;
-    filter: none !important;
-    border-color: #000000 !important;
-  }
-  body.print-safe .spore-canvas,
-  body.print-safe .no-print { display: none !important; }
-  body.print-safe::before { display: none !important; }
 }

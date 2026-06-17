@@ -3,8 +3,9 @@ import OrganicCard from "@/components/OrganicCard";
 import PageHeader from "@/components/PageHeader";
 import MushroomDecor from "@/components/MushroomDecor";
 import { useCharacter } from "@/contexts/CharacterContext";
-import { Plus, Trash2, Pencil, Printer } from "lucide-react";
+import { Plus, Trash2, Pencil, FileDown } from "lucide-react";
 import ImageInput from "@/components/ImageInput";
+import { exportEntryPdf } from "@/lib/pdfExport";
 
 /**
  * EntityPage — reusable list+modal CRUD page.
@@ -40,17 +41,9 @@ export default function EntityPage({ title, subtitle, api, fields, render, testi
   const save = async () => { await api.update(editing.id, editing); await load(); setEditing(null); };
   const remove = async () => { if (window.confirm("Let this entry return to the network?")) { await api.remove(editing.id); await load(); setEditing(null); } };
 
-  const printEntry = () => {
-    document.body.classList.add("print-entry-mode");
-    const card = document.querySelector(`[data-entry-modal="${testidPrefix}"]`);
-    if (card) card.classList.add("print-selected");
-    setTimeout(() => {
-      window.print();
-      setTimeout(() => {
-        document.body.classList.remove("print-entry-mode");
-        if (card) card.classList.remove("print-selected");
-      }, 500);
-    }, 50);
+  const printEntry = async () => {
+    try { await exportEntryPdf(testidPrefix, editing, { character: current }); }
+    catch (err) { console.error("PDF export failed", err); window.alert("PDF export failed: " + (err?.message || err)); }
   };
 
   if (!current) return null;
@@ -101,7 +94,7 @@ export default function EntityPage({ title, subtitle, api, fields, render, testi
             <div className="flex justify-between gap-2 mt-4">
               <button className="btn-danger" onClick={remove} data-testid={`${testidPrefix}-delete`}><Trash2 size={12}/> Delete</button>
               <div className="flex gap-2">
-                <button className="btn-ghost" onClick={printEntry} data-testid={`${testidPrefix}-print-entry`}><Printer size={12}/> Export this entry</button>
+                <button className="btn-ghost" onClick={printEntry} data-testid={`${testidPrefix}-print-entry`}><FileDown size={12}/> Export this entry</button>
                 <button className="btn-ghost" onClick={() => setEditing(null)}>Cancel</button>
                 <button className="btn-organic" onClick={save} data-testid={`${testidPrefix}-save`}>Save</button>
               </div>

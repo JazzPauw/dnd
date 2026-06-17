@@ -71,27 +71,101 @@ export default function SporeCanvas({ count = 70, effect = "spore", color = "#9d
         }
         s.x += s.vx;
         s.y += s.vy;
-        // drift damping
         s.vx *= 0.985;
         s.vy *= 0.99;
-        s.vy -= cfg.dy * 0.1; // theme-specific drift
-        // wrap
+        s.vy -= cfg.dy * 0.1;
         if (s.y < -10) { s.y = canvas.height + 10; s.x = rand(0, canvas.width); }
+        if (s.y > canvas.height + 10) { s.y = -10; s.x = rand(0, canvas.width); }
         if (s.x < -10) s.x = canvas.width + 10;
         if (s.x > canvas.width + 10) s.x = -10;
 
+        // soft glow
         const grd = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 6);
         grd.addColorStop(0, `hsla(${s.hue}, 80%, 65%, ${s.alpha})`);
         grd.addColorStop(1, "hsla(280, 80%, 60%, 0)");
         ctx.fillStyle = grd;
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r * 6, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r * 6, 0, Math.PI * 2); ctx.fill();
 
-        ctx.fillStyle = `hsla(${s.hue}, 90%, 80%, ${Math.min(1, s.alpha + 0.2)})`;
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fill();
+        // shape per effect
+        const col = `hsla(${s.hue}, 90%, 78%, ${Math.min(1, s.alpha + 0.25)})`;
+        ctx.fillStyle = col; ctx.strokeStyle = col; ctx.lineWidth = 0.8;
+        ctx.save(); ctx.translate(s.x, s.y);
+        const t = (performance.now() / 1000) + s.hue;
+        switch (effect) {
+          case "leaf": {
+            ctx.rotate(Math.sin(t) * 0.6);
+            ctx.beginPath();
+            ctx.ellipse(0, 0, s.r * 2.2, s.r, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath(); ctx.moveTo(-s.r * 2.2, 0); ctx.lineTo(s.r * 2.2, 0); ctx.stroke();
+            break;
+          }
+          case "rune": {
+            ctx.rotate(s.hue * 0.05);
+            const k = s.r * 2;
+            ctx.beginPath();
+            ctx.moveTo(-k, -k); ctx.lineTo(k, -k); ctx.lineTo(0, k); ctx.closePath();
+            ctx.stroke();
+            ctx.beginPath(); ctx.arc(0, 0, s.r * 0.7, 0, Math.PI * 2); ctx.fill();
+            break;
+          }
+          case "ember": case "spark": {
+            ctx.beginPath();
+            ctx.moveTo(0, -s.r * 3); ctx.lineTo(0, s.r * 3);
+            ctx.moveTo(-s.r * 1.5, 0); ctx.lineTo(s.r * 1.5, 0);
+            ctx.stroke();
+            ctx.beginPath(); ctx.arc(0, 0, s.r * 0.8, 0, Math.PI * 2); ctx.fill();
+            break;
+          }
+          case "wisp": {
+            ctx.beginPath();
+            ctx.ellipse(0, 0, s.r * 1.4, s.r * 3, Math.sin(t) * 0.8, 0, Math.PI * 2);
+            ctx.fill();
+            break;
+          }
+          case "halo": {
+            ctx.lineWidth = 1.2; ctx.beginPath();
+            ctx.arc(0, 0, s.r * 2.2, 0, Math.PI * 2); ctx.stroke();
+            break;
+          }
+          case "blood": {
+            ctx.beginPath();
+            ctx.moveTo(0, -s.r * 2);
+            ctx.bezierCurveTo(s.r * 1.6, -s.r * 0.5, s.r * 1.2, s.r * 1.6, 0, s.r * 2);
+            ctx.bezierCurveTo(-s.r * 1.2, s.r * 1.6, -s.r * 1.6, -s.r * 0.5, 0, -s.r * 2);
+            ctx.fill();
+            break;
+          }
+          case "note": {
+            ctx.beginPath(); ctx.ellipse(-s.r, s.r * 0.6, s.r * 1.1, s.r * 0.8, -0.4, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(s.r * 0.1, s.r * 0.6); ctx.lineTo(s.r * 0.1, -s.r * 2.4); ctx.stroke();
+            break;
+          }
+          case "shadow": {
+            ctx.rotate(Math.atan2(s.vy, s.vx));
+            ctx.beginPath();
+            ctx.moveTo(-s.r * 3, 0); ctx.lineTo(s.r * 3, -s.r); ctx.lineTo(s.r * 3, s.r); ctx.closePath();
+            ctx.fill();
+            break;
+          }
+          case "gear": {
+            ctx.rotate(t * 0.6);
+            const teeth = 8, rOut = s.r * 2.4, rIn = s.r * 1.6;
+            ctx.beginPath();
+            for (let i = 0; i < teeth * 2; i++) {
+              const ang = (i / (teeth * 2)) * Math.PI * 2;
+              const rr = i % 2 === 0 ? rOut : rIn;
+              ctx[i ? "lineTo" : "moveTo"](Math.cos(ang) * rr, Math.sin(ang) * rr);
+            }
+            ctx.closePath(); ctx.stroke();
+            ctx.beginPath(); ctx.arc(0, 0, s.r * 0.7, 0, Math.PI * 2); ctx.fill();
+            break;
+          }
+          case "mote": case "ki": default: {
+            ctx.beginPath(); ctx.arc(0, 0, s.r, 0, Math.PI * 2); ctx.fill();
+          }
+        }
+        ctx.restore();
       }
       raf = requestAnimationFrame(draw);
     };

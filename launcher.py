@@ -28,6 +28,7 @@ import urllib.parse
 import urllib.request
 import webbrowser
 from pathlib import Path
+from typing import Optional
 
 ROOT = Path(__file__).resolve().parent
 FRONT_BUILD = ROOT / "frontend" / "build"
@@ -160,8 +161,52 @@ def start_frontend() -> None:
         httpd.server_close()
 
 
+def _which(cmd: str) -> Optional[str]:
+    from shutil import which
+    return which(cmd)
+
+
+def _check_backend_deps() -> bool:
+    try:
+        import fastapi, uvicorn, motor, pydantic, dotenv  # noqa: F401
+        return True
+    except ImportError:
+        return False
+
+
+def _install_backend_deps() -> None:
+    req = BACKEND_DIR / "requirements.txt"
+    print("[setup] installing backend dependencies…")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "--quiet", "--disable-pip-version-check", "-r", str(req)])
+
+
+def _ensure_frontend_build() -> None:
+    if (FRONT_BUILD / "index.html").exists():
+        return
+    yarn = _which("yarn")
+    if not yarn:
+        print("\n[!] yarn not found. Install Node 18+ and: npm i -g yarn\n")
+        sys.exit(1)
+    front = ROOT / "frontend"
+    if not (front / "node_modules").exists():
+        print("[setup] installing frontend dependencies (this can take a few minutes)…")
+        subprocess.check_call([yarn, "install", "--silent"], cwd=str(front))
+    print("[setup] building frontend…")
+    subprocess.check_call([yarn, "build"], cwd=str(front))
+
+
+def initial_setup() -> None:
+    if not _check_backend_deps():
+        _install_backend_deps()
+    _ensure_frontend_build()
+
+
 def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+    try:
+        initial_setup()
+    except subprocess.CalledProcessError as e:
+        print(f"\n[!] setup failed: {e}\n"); sys.exit(1)
     try:
         from updater import check_for_updates
         check_for_updates()

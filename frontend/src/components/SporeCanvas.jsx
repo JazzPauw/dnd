@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from "react";
  * SporeCanvas — animated drifting spores in the background.
  * Mouse movement subtly repels nearby spores.
  */
-export default function SporeCanvas({ count = 70 }) {
+export default function SporeCanvas({ count = 70, effect = "spore", color = "#9d4cdd" }) {
   const canvasRef = useRef(null);
   const mouseRef = useRef({ x: -9999, y: -9999 });
 
@@ -13,6 +13,23 @@ export default function SporeCanvas({ count = 70 }) {
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     let raf = 0;
+
+    // Effect tuning per D&D class theme
+    const cfg = ({
+      spore:  { hue: [265,295], dy: -0.05, soft: 1.0, fast: false },
+      leaf:   { hue: [85,130],  dy:  0.04, soft: 0.7, fast: false },
+      rune:   { hue: [200,230], dy: -0.02, soft: 1.2, fast: false },
+      ember:  { hue: [10,35],   dy: -0.12, soft: 0.8, fast: true  },
+      wisp:   { hue: [275,305], dy: -0.08, soft: 1.4, fast: false },
+      mote:   { hue: [45,60],   dy: -0.03, soft: 1.3, fast: false },
+      halo:   { hue: [40,55],   dy: -0.04, soft: 1.1, fast: false },
+      spark:  { hue: [15,30],   dy: -0.18, soft: 0.5, fast: true  },
+      blood:  { hue: [355,10],  dy:  0.10, soft: 0.7, fast: true  },
+      note:   { hue: [310,340], dy: -0.05, soft: 1.0, fast: false },
+      shadow: { hue: [160,185], dy:  0.0,  soft: 0.4, fast: true  },
+      ki:     { hue: [175,200], dy: -0.04, soft: 1.3, fast: false },
+      gear:   { hue: [35,50],   dy:  0.0,  soft: 0.6, fast: false },
+    }[effect]) || { hue: [265,295], dy: -0.05, soft: 1.0, fast: false };
 
     const resize = () => {
       canvas.width = window.innerWidth;
@@ -31,11 +48,11 @@ export default function SporeCanvas({ count = 70 }) {
     const spores = Array.from({ length: count }, () => ({
       x: rand(0, canvas.width),
       y: rand(0, canvas.height),
-      r: rand(0.6, 2.4),
-      vx: rand(-0.12, 0.12),
-      vy: rand(-0.35, -0.05),
+      r: rand(0.6, 2.4) * cfg.soft,
+      vx: rand(-0.12, 0.12) * (cfg.fast ? 1.8 : 1),
+      vy: rand(-0.35, -0.05) * (cfg.fast ? 1.6 : 1),
       alpha: rand(0.12, 0.4),
-      hue: rand(265, 295),
+      hue: rand(cfg.hue[0], cfg.hue[1]),
     }));
 
     const draw = () => {
@@ -57,7 +74,7 @@ export default function SporeCanvas({ count = 70 }) {
         // drift damping
         s.vx *= 0.985;
         s.vy *= 0.99;
-        s.vy -= 0.005; // upward bias
+        s.vy -= cfg.dy * 0.1; // theme-specific drift
         // wrap
         if (s.y < -10) { s.y = canvas.height + 10; s.x = rand(0, canvas.width); }
         if (s.x < -10) s.x = canvas.width + 10;
@@ -85,7 +102,7 @@ export default function SporeCanvas({ count = 70 }) {
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", handleMove);
     };
-  }, [count]);
+  }, [count, effect, color]);
 
   return <canvas ref={canvasRef} className="spore-canvas no-print" data-testid="spore-canvas" />;
 }

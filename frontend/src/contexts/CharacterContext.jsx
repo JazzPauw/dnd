@@ -3,20 +3,9 @@ import { characters as charApi, themes as themesApi } from "@/lib/api";
 
 const CharacterContext = createContext(null);
 
-export const DEFAULT_THEME = {
-  id: "default-mycelium",
-  name: "Mycelial Default",
-  accent_glow: "#9d4cdd",
-  accent_spore: "#b47ee5",
-  bg_base: "#070907",
-  bg_surface: "#101411",
-  text_primary: "#e4dcd3",
-  text_magical: "#c69bf1",
-  font_heading: "'Gloock', serif",
-  font_body: "'Crimson Text', serif",
-  animations: true,
-  card_style: "organic",
-};
+import { CLASS_THEMES } from "@/lib/classThemes";
+
+export const DEFAULT_THEME = CLASS_THEMES[0]; // Druid · Mycelial
 
 const applyTheme = (theme) => {
   const t = { ...DEFAULT_THEME, ...(theme || {}) };
@@ -47,7 +36,7 @@ export const CharacterProvider = ({ children }) => {
 
   const refreshThemes = useCallback(async () => {
     const list = await themesApi.list();
-    setThemes([DEFAULT_THEME, ...list]);
+    setThemes([...CLASS_THEMES, ...list]);
     return list;
   }, []);
 

@@ -47,7 +47,7 @@ function Shell() {
 
   return (
     <>
-      {animations && <SporeCanvas />}
+      {animations && <SporeCanvas effect={theme?.effect || "spore"} color={theme?.accent_glow} />}
       <div className="app-shell flex">
         <Sidebar onOpenSearch={() => setPaletteOpen(true)} />
         <main className="flex-1 p-8 max-w-[1400px] mx-auto" data-testid="main-content">

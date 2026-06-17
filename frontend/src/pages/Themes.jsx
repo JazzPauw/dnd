@@ -10,7 +10,7 @@ export default function Themes() {
   const [editing, setEditing] = useState(null);
 
   const create = async () => {
-    const fresh = { ...DEFAULT_THEME, name: "New Theme", id: undefined };
+    const fresh = { ...DEFAULT_THEME, name: "New Theme", effect: "spore", id: undefined };
     delete fresh.id;
     const out = await themeApi.create(fresh);
     await refreshThemes();
@@ -74,6 +74,7 @@ export default function Themes() {
               <label><span className="label-arcane">Magical text</span><input type="color" value={editing.text_magical} onChange={(e) => setEditing({ ...editing, text_magical: e.target.value })}/></label>
               <label className="col-span-2"><span className="label-arcane">Heading font (CSS)</span><input value={editing.font_heading} onChange={(e) => setEditing({ ...editing, font_heading: e.target.value })}/></label>
               <label className="col-span-2"><span className="label-arcane">Body font (CSS)</span><input value={editing.font_body} onChange={(e) => setEditing({ ...editing, font_body: e.target.value })}/></label>
+              <label className="col-span-2"><span className="label-arcane">Background effect</span><select value={editing.effect || "spore"} onChange={(e) => setEditing({ ...editing, effect: e.target.value })}>{["spore","leaf","rune","ember","wisp","mote","halo","spark","blood","note","shadow","ki","gear"].map((x) => <option key={x} value={x}>{x}</option>)}</select></label>
               <label className="col-span-2 flex items-center gap-2 text-sm"><input type="checkbox" className="!w-4" checked={!!editing.animations} onChange={(e) => setEditing({ ...editing, animations: e.target.checked })}/> Enable animations & spores</label>
             </div>
             <div className="flex justify-between gap-2 mt-4">

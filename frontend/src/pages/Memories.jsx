@@ -3,7 +3,7 @@ import OrganicCard from "@/components/OrganicCard";
 import PageHeader from "@/components/PageHeader";
 import { useCharacter } from "@/contexts/CharacterContext";
 import { memories } from "@/lib/api";
-import { Plus, Trash2, Printer } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 
 import ImageInput from "@/components/ImageInput";
 
@@ -28,12 +28,6 @@ export default function Memories() {
   };
   const save = async () => { await memories.update(editing.id, editing); await load(); setEditing(null); };
   const remove = async () => { if (window.confirm("Let this memory drift?")) { await memories.remove(editing.id); await load(); setEditing(null); } };
-  const printEntry = () => {
-    document.body.classList.add("print-entry-mode");
-    const card = document.querySelector('[data-entry-modal="memory"]');
-    if (card) card.classList.add("print-selected");
-    setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove("print-entry-mode"); if (card) card.classList.remove("print-selected"); }, 500); }, 50);
-  };
 
   if (!current) return null;
   return (
@@ -80,7 +74,7 @@ export default function Memories() {
         {items.map((m) => {
           const t = TRUTH.find((x) => x.value === m.truth) || TRUTH[0];
           return (
-            <OrganicCard key={`l-${m.id}`} testid={`memory-card-${m.id}`} className="cursor-pointer" data-print-card="" onClick={() => setEditing(m)}>
+            <OrganicCard key={`l-${m.id}`} testid={`memory-card-${m.id}`} className="cursor-pointer" onClick={() => setEditing(m)}>
               <p className="label-arcane" style={{ color: t.color }}>{t.label}</p>
               <h3 className="font-arcane text-xl mt-1">{m.title}</h3>
               <p className="text-xs text-[var(--text-tertiary)] mt-1">{m.date} · {m.location}</p>
@@ -91,8 +85,8 @@ export default function Memories() {
       </div>
 
       {editing && (
-        <div data-entry-modal-backdrop className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm flex items-start justify-center p-6 overflow-y-auto no-print" onClick={() => setEditing(null)}>
-          <OrganicCard className="max-w-2xl w-full" data-entry-modal="memory" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm flex items-start justify-center p-6 overflow-y-auto" onClick={() => setEditing(null)}>
+          <OrganicCard className="max-w-2xl w-full" onClick={(e) => e.stopPropagation()}>
             <h2 className="font-arcane text-2xl mb-3">{editing.title}</h2>
             <div className="grid grid-cols-2 gap-3">
               <label className="col-span-2"><span className="label-arcane">Title</span><input value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} data-testid="memory-edit-title"/></label>
@@ -123,7 +117,7 @@ export default function Memories() {
             </div>
             <div className="flex justify-between gap-2 mt-4">
               <button className="btn-danger" onClick={remove}><Trash2 size={12}/> Delete</button>
-              <div className="flex gap-2"><button className="btn-ghost" onClick={printEntry} data-testid="memory-print-entry"><Printer size={12}/> Export this entry</button><button className="btn-ghost" onClick={() => setEditing(null)}>Cancel</button><button className="btn-organic" onClick={save} data-testid="memory-save">Save</button></div>
+              <div className="flex gap-2"><button className="btn-ghost" onClick={() => setEditing(null)}>Cancel</button><button className="btn-organic" onClick={save} data-testid="memory-save">Save</button></div>
             </div>
           </OrganicCard>
         </div>

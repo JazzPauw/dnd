@@ -3,7 +3,7 @@ import OrganicCard from "@/components/OrganicCard";
 import PageHeader from "@/components/PageHeader";
 import MushroomDecor from "@/components/MushroomDecor";
 import { useCharacter } from "@/contexts/CharacterContext";
-import { Plus, Trash2, Pencil, Printer } from "lucide-react";
+import { Plus, Trash2, Pencil } from "lucide-react";
 import ImageInput from "@/components/ImageInput";
 
 /**
@@ -40,19 +40,6 @@ export default function EntityPage({ title, subtitle, api, fields, render, testi
   const save = async () => { await api.update(editing.id, editing); await load(); setEditing(null); };
   const remove = async () => { if (window.confirm("Let this entry return to the network?")) { await api.remove(editing.id); await load(); setEditing(null); } };
 
-  const printEntry = () => {
-    document.body.classList.add("print-entry-mode");
-    const card = document.querySelector(`[data-entry-modal="${testidPrefix}"]`);
-    if (card) card.classList.add("print-selected");
-    setTimeout(() => {
-      window.print();
-      setTimeout(() => {
-        document.body.classList.remove("print-entry-mode");
-        if (card) card.classList.remove("print-selected");
-      }, 500);
-    }, 50);
-  };
-
   if (!current) return null;
   return (
     <div data-testid={`${testidPrefix}-page`} className="relative">
@@ -65,7 +52,7 @@ export default function EntityPage({ title, subtitle, api, fields, render, testi
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {filtered.length === 0 && <p className="italic text-[var(--text-tertiary)] text-sm">{emptyText}</p>}
         {filtered.map((it) => (
-          <OrganicCard key={it.id} forbidden={forbiddenKey && it[forbiddenKey] === "forbidden"} testid={`${testidPrefix}-card-${it.id}`} className="cursor-pointer" data-print-card="" onClick={() => setEditing(it)}>
+          <OrganicCard key={it.id} forbidden={forbiddenKey && it[forbiddenKey] === "forbidden"} testid={`${testidPrefix}-card-${it.id}`} className="cursor-pointer" onClick={() => setEditing(it)}>
             {render(it)}
             <button onClick={(e) => { e.stopPropagation(); setEditing(it); }} className="btn-ghost p-1 absolute top-2 right-2" data-testid={`${testidPrefix}-edit-${it.id}`}><Pencil size={12}/></button>
           </OrganicCard>
@@ -73,8 +60,8 @@ export default function EntityPage({ title, subtitle, api, fields, render, testi
       </div>
 
       {editing && (
-        <div data-entry-modal-backdrop className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm flex items-start justify-center p-6 overflow-y-auto no-print" onClick={() => setEditing(null)}>
-          <OrganicCard forbidden={forbiddenKey && editing[forbiddenKey] === "forbidden"} className="max-w-2xl w-full" data-entry-modal={testidPrefix} onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm flex items-start justify-center p-6 overflow-y-auto no-print" onClick={() => setEditing(null)}>
+          <OrganicCard forbidden={forbiddenKey && editing[forbiddenKey] === "forbidden"} className="max-w-2xl w-full" onClick={(e) => e.stopPropagation()}>
             <h2 className="font-arcane text-2xl mb-3">{editing[fields[0].key] || "New entry"}</h2>
             <div className="grid grid-cols-2 gap-3">
               {fields.map((f) => (
@@ -101,7 +88,6 @@ export default function EntityPage({ title, subtitle, api, fields, render, testi
             <div className="flex justify-between gap-2 mt-4">
               <button className="btn-danger" onClick={remove} data-testid={`${testidPrefix}-delete`}><Trash2 size={12}/> Delete</button>
               <div className="flex gap-2">
-                <button className="btn-ghost" onClick={printEntry} data-testid={`${testidPrefix}-print-entry`}><Printer size={12}/> Export this entry</button>
                 <button className="btn-ghost" onClick={() => setEditing(null)}>Cancel</button>
                 <button className="btn-organic" onClick={save} data-testid={`${testidPrefix}-save`}>Save</button>
               </div>

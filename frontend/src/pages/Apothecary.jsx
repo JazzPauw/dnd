@@ -3,7 +3,7 @@ import OrganicCard from "@/components/OrganicCard";
 import PageHeader from "@/components/PageHeader";
 import { useCharacter } from "@/contexts/CharacterContext";
 import { recipes } from "@/lib/api";
-import { Plus, Trash2, Printer } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 
 const CATEGORIES = [
   { key: "known", label: "Known Recipes" },
@@ -29,12 +29,6 @@ export default function Apothecary() {
   };
   const save = async () => { await recipes.update(editing.id, editing); await load(); setEditing(null); };
   const remove = async () => { if (window.confirm("Discard?")) { await recipes.remove(editing.id); await load(); setEditing(null); } };
-  const printEntry = () => {
-    document.body.classList.add("print-entry-mode");
-    const card = document.querySelector('[data-entry-modal="recipe"]');
-    if (card) card.classList.add("print-selected");
-    setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove("print-entry-mode"); if (card) card.classList.remove("print-selected"); }, 500); }, 50);
-  };
 
   if (!current) return null;
   return (
@@ -56,7 +50,7 @@ export default function Apothecary() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {filtered.length === 0 && <p className="italic text-[var(--text-tertiary)] text-sm">No recipes recorded in this archive.</p>}
         {filtered.map((r) => (
-          <OrganicCard key={r.id} forbidden={r.category === "forbidden"} testid={`recipe-card-${r.id}`} className="cursor-pointer" data-print-card="" onClick={() => setEditing(r)}>
+          <OrganicCard key={r.id} forbidden={r.category === "forbidden"} testid={`recipe-card-${r.id}`} className="cursor-pointer" onClick={() => setEditing(r)}>
             <h3 className="font-arcane text-xl">{r.name}</h3>
             <p className="label-arcane mt-1">success {r.success_chance ?? "?"}%</p>
             <p className="text-xs font-mono mt-2 text-[var(--text-tertiary)] line-clamp-2"><span className="label-arcane">ingr:</span> {r.ingredients}</p>
@@ -67,8 +61,8 @@ export default function Apothecary() {
       </div>
 
       {editing && (
-        <div data-entry-modal-backdrop className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm flex items-start justify-center p-6 overflow-y-auto no-print" onClick={() => setEditing(null)}>
-          <OrganicCard forbidden={editing.category === "forbidden"} className="max-w-2xl w-full" data-entry-modal="recipe" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm flex items-start justify-center p-6 overflow-y-auto" onClick={() => setEditing(null)}>
+          <OrganicCard forbidden={editing.category === "forbidden"} className="max-w-2xl w-full" onClick={(e) => e.stopPropagation()}>
             <h2 className="font-arcane text-2xl mb-3">{editing.name}</h2>
             <div className="grid grid-cols-2 gap-3">
               <label className="col-span-2"><span className="label-arcane">Name</span><input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} data-testid="recipe-edit-name" /></label>
@@ -82,7 +76,7 @@ export default function Apothecary() {
             </div>
             <div className="flex justify-between gap-2 mt-4">
               <button className="btn-danger" onClick={remove}><Trash2 size={12}/> Delete</button>
-              <div className="flex gap-2"><button className="btn-ghost" onClick={printEntry} data-testid="recipe-print-entry"><Printer size={12}/> Export this entry</button><button className="btn-ghost" onClick={() => setEditing(null)}>Cancel</button><button className="btn-organic" onClick={save} data-testid="recipe-save">Save</button></div>
+              <div className="flex gap-2"><button className="btn-ghost" onClick={() => setEditing(null)}>Cancel</button><button className="btn-organic" onClick={save} data-testid="recipe-save">Save</button></div>
             </div>
           </OrganicCard>
         </div>

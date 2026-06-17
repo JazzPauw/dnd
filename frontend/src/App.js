@@ -51,16 +51,7 @@ function Shell() {
       <div className="app-shell flex">
         <Sidebar onOpenSearch={() => setPaletteOpen(true)} />
         <main className="flex-1 p-8 max-w-[1400px] mx-auto" data-testid="main-content">
-          <div className="flex justify-end mb-2 no-print gap-2 items-center">
-            <label className="flex items-center gap-1 text-xs text-[var(--text-secondary)] cursor-pointer" data-testid="print-safe-label">
-              <input
-                type="checkbox"
-                className="!w-3"
-                data-testid="print-safe-toggle"
-                onChange={(e) => document.body.classList.toggle('print-safe', e.target.checked)}
-              />
-              Print-safe (white)
-            </label>
+          <div className="flex justify-end mb-2 no-print gap-2">
             <button onClick={() => window.print()} className="btn-ghost text-xs" data-testid="export-pdf-btn"><Printer size={12}/> Export this page</button>
           </div>
           <Routes>

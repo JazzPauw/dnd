@@ -32,12 +32,6 @@ export default function Spells() {
     document.body.classList.add("print-selection-mode");
     setTimeout(() => { window.print(); setTimeout(() => document.body.classList.remove("print-selection-mode"), 500); }, 50);
   };
-  const printEntry = () => {
-    document.body.classList.add("print-entry-mode");
-    const card = document.querySelector('[data-entry-modal="spell"]');
-    if (card) card.classList.add("print-selected");
-    setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove("print-entry-mode"); if (card) card.classList.remove("print-selected"); }, 500); }, 50);
-  };
 
   const load = async () => current && setList(await spells.list({ character_id: current.id }));
   const loadPresets = async () => current && setPresets(await presetsApi.list({ character_id: current.id }));
@@ -152,7 +146,7 @@ export default function Spells() {
       {/* Spell grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {filtered.map((s) => (
-          <OrganicCard key={s.id} testid={`spell-${s.id}`} className="cursor-pointer" data-print-card="" onClick={() => setEditing(s)}>
+          <OrganicCard key={s.id} testid={`spell-${s.id}`} className="cursor-pointer" onClick={() => setEditing(s)}>
             <div className="flex justify-between items-start">
               <h3 className="font-arcane text-xl">{s.name}</h3>
               <span className="label-arcane">Lv {s.level}</span>
@@ -175,8 +169,8 @@ export default function Spells() {
 
       {/* Editor modal */}
       {editing && (
-        <div data-entry-modal-backdrop className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm flex items-start justify-center p-6 overflow-y-auto no-print" onClick={() => setEditing(null)}>
-          <OrganicCard className="max-w-2xl w-full" data-entry-modal="spell" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm flex items-start justify-center p-6 overflow-y-auto" onClick={() => setEditing(null)}>
+          <OrganicCard className="max-w-2xl w-full" onClick={(e) => e.stopPropagation()}>
             <h2 className="font-arcane text-3xl mb-3"><Sparkles size={16} className="inline mr-2"/> Inscribe Spell</h2>
             <div className="grid grid-cols-2 gap-3">
               <label><span className="label-arcane">Name</span><input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} data-testid="spell-edit-name"/></label>
@@ -190,21 +184,6 @@ export default function Spells() {
             </div>
             <label className="block mt-3"><span className="label-arcane">Description</span><textarea rows={5} value={editing.description} onChange={(e) => setEditing({ ...editing, description: e.target.value })}/></label>
             <label className="block mt-3"><span className="label-arcane">Notes</span><textarea rows={2} value={editing.notes} onChange={(e) => setEditing({ ...editing, notes: e.target.value })}/></label>
-            <div className="mt-4 p-3 border border-[var(--accent-glow)]/30 rounded bg-[var(--accent-glow)]/5">
-              <label className="text-sm flex items-center gap-2 font-heading">
-                <input
-                  type="checkbox"
-                  className="!w-4"
-                  checked={!!editing.always_prepared}
-                  onChange={(e) => setEditing({ ...editing, always_prepared: e.target.checked })}
-                  data-testid="spell-always-prepared"
-                />
-                Concurrent (always prepared — e.g. Ranger spells)
-              </label>
-              <p className="text-xs text-[var(--text-tertiary)] mt-1 ml-6 italic">
-                Always-prepared spells never count against your daily prepared limit and stay active across rest. Use this for class features like Ranger favored spells, Pact Magic, or oath/circle spells.
-              </p>
-            </div>
             <div className="flex gap-4 mt-3">
               <label className="text-sm flex items-center gap-1"><input type="checkbox" className="!w-3" checked={!!editing.prepared} onChange={(e) => setEditing({ ...editing, prepared: e.target.checked })}/> prepared</label>
               <label className="text-sm flex items-center gap-1"><input type="checkbox" className="!w-3" checked={!!editing.concentration} onChange={(e) => setEditing({ ...editing, concentration: e.target.checked })}/> concentration</label>
@@ -213,7 +192,6 @@ export default function Spells() {
             <div className="flex justify-between gap-2 mt-4">
               <button className="btn-danger" onClick={async () => { await spells.remove(editing.id); await load(); setEditing(null); }} data-testid="spell-delete"><Trash2 size={12}/> Delete</button>
               <div className="flex gap-2">
-                <button className="btn-ghost" onClick={printEntry} data-testid="spell-print-entry"><Printer size={12}/> Export this entry</button>
                 <button className="btn-ghost" onClick={() => setEditing(null)}>Cancel</button>
                 <button className="btn-organic" onClick={save} data-testid="spell-save">Save</button>
               </div>

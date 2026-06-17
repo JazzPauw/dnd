@@ -11,6 +11,15 @@ python3 launcher.py            # installs deps, builds frontend, opens http://lo
 python3 create_shortcut.py     # optional: desktop launcher
 ```
 
+## Single-file binary (for sharing with friends)
+
+Build once, then share `dist/MycelialArchive` (or `MycelialArchive.exe` on Windows) — recipients only need to double-click; no Python or Node required.
+
+```bash
+./build_installer.sh           # Linux / macOS  → dist/MycelialArchive
+build_installer.bat            # Windows        → dist\MycelialArchive.exe
+```
+
 The launcher handles initial setup automatically on first run:
 1. Installs missing backend Python deps.
 2. Installs frontend node_modules and builds the React app if `frontend/build` is missing.

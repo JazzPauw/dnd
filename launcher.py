@@ -30,7 +30,7 @@ import webbrowser
 from pathlib import Path
 from typing import Optional
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
 FRONT_BUILD = ROOT / "frontend" / "build"
 BACKEND_DIR = ROOT / "backend"
 
@@ -82,8 +82,15 @@ def start_backend() -> subprocess.Popen:
     env["MYCELIUM_DATA_DIR"] = str(DATA_DIR)
     env.setdefault("DB_NAME", "mycelial_archive")
     env.setdefault("CORS_ORIGINS", f"http://localhost:{FRONT_PORT},http://127.0.0.1:{FRONT_PORT}")
+    # When frozen by PyInstaller, sys.executable is the bundled exe itself;
+    # uvicorn is importable so we run it via -m on a python that exists at runtime.
+    py = sys.executable if not getattr(sys, "frozen", False) else sys.executable
+    if getattr(sys, "frozen", False):
+        # Run uvicorn in-process inside this same frozen binary via a subprocess wrapper.
+        env["MYCELIUM_RUN_BACKEND"] = "1"
+        return subprocess.Popen([py], env=env, cwd=str(BACKEND_DIR))
     return subprocess.Popen(
-        [sys.executable, "-m", "uvicorn", "server:app",
+        [py, "-m", "uvicorn", "server:app",
          "--host", "127.0.0.1", "--port", str(BACK_PORT), "--log-level", "warning"],
         cwd=str(BACKEND_DIR), env=env,
     )
@@ -156,9 +163,12 @@ def start_frontend() -> None:
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
-        pass
+        print("\n[mycelium] shutting down…")
+    except Exception as e:
+        print(f"\n[!] frontend server error: {e}")
     finally:
-        httpd.server_close()
+        try: httpd.server_close()
+        except Exception: pass
 
 
 def _which(cmd: str) -> Optional[str]:
@@ -201,12 +211,27 @@ def initial_setup() -> None:
     _ensure_frontend_build()
 
 
+def _free_port(port: int) -> bool:
+    """Return True if the port is bindable (i.e. nothing else is listening)."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        try:
+            s.bind(("127.0.0.1", port)); return True
+        except OSError:
+            return False
+
+
 def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+    if not _free_port(FRONT_PORT):
+        print(f"\n[!] Port {FRONT_PORT} is already in use. Another instance running?")
+        print(f"    Set MYCELIUM_FRONT_PORT=<other> and re-run.\n")
+        _hold(); return
     try:
         initial_setup()
     except subprocess.CalledProcessError as e:
-        print(f"\n[!] setup failed: {e}\n"); sys.exit(1)
+        print(f"\n[!] setup failed: {e}\n"); _hold(); return
+    except Exception as e:
+        print(f"\n[!] setup error: {e}\n"); _hold(); return
     try:
         from updater import check_for_updates
         check_for_updates()
@@ -225,4 +250,17 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    # When the frozen exe re-invokes itself to host uvicorn, take that branch first.
+    if os.environ.get("MYCELIUM_RUN_BACKEND") == "1":
+        sys.path.insert(0, str(BACKEND_DIR))
+        import uvicorn
+        uvicorn.run("server:app", host="127.0.0.1", port=BACK_PORT, log_level="warning")
+        sys.exit(0)
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n[mycelium] shutting down…")
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        print(f"\n[!] unexpected error: {e}")
+        _hold()
